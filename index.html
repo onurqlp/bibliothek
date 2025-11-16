@@ -7,607 +7,140 @@
   <meta name="color-scheme" content="light" />
   <meta name="theme-color" content="#234078" />
   <style>
-    :root {
-      --ayda:#234078;
-      --ayda-soft:#2f4f91;
-      --bg:#f4f6fb;
-      --ink:#141824;
-      --muted:#6b7280;
-      --card:#ffffff;
-      --border:rgba(0,0,0,.05);
-      --radius-full:999px;
-      --shadow-lg:0 18px 45px rgba(0,0,0,.08);
-      --shadow-soft:0 10px 25px rgba(0,0,0,.05);
+    :root{
+      --ayda:#234078;--ayda-soft:#2f4f91;--bg:#f4f6fb;--ink:#141824;--muted:#6b7280;--card:#ffffff;--border:rgba(0,0,0,.05);
+      --radius-full:999px;--shadow-lg:0 18px 45px rgba(0,0,0,.08);--shadow-soft:0 10px 25px rgba(0,0,0,.05);
     }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--ink);
+      background:radial-gradient(circle at top left,#fdfcff 0,#edf2ff 26%,#e4ecff 60%,#dde6ff 100%);min-height:100vh}
+    body{display:flex;align-items:center;justify-content:center;padding:16px}
+    .wrap{width:100%;max-width:1200px;background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(244,246,252,.98));
+      box-shadow:var(--shadow-lg);border-radius:26px;padding:24px 22px 22px;border:1px solid rgba(255,255,255,.6);backdrop-filter:blur(20px)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 4px 12px;border-bottom:1px solid rgba(35,64,120,.08);margin-bottom:16px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand-logo{width:38px;height:38px;border-radius:14px;background:conic-gradient(from 210deg,var(--ayda),#3b82f6,#22c55e,var(--ayda));
+      display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;box-shadow:0 10px 25px rgba(35,64,120,.45)}
+    .brand-text-title{font-size:18px;font-weight:700;letter-spacing:.02em}
+    .brand-text-sub{font-size:12px;color:var(--muted)}
+    .pill{font-size:11px;padding:5px 10px;border-radius:var(--radius-full);background:rgba(35,64,120,.06);color:var(--ayda);
+      display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+    .pill-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.25)}
 
-    * { box-sizing:border-box; }
+    /* Giriş kartı */
+    .gate{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr);gap:22px;padding:20px 18px 18px;border-radius:22px;
+      background:radial-gradient(circle at top left,rgba(35,64,120,.1),transparent 55%),linear-gradient(135deg,#ffffff,rgba(255,255,255,.65));
+      box-shadow:var(--shadow-soft)}
+    .gate-main-title{font-size:20px;font-weight:700;margin-bottom:4px}
+    .gate-main-sub{font-size:13px;color:var(--muted);max-width:360px}
+    .code-form{margin-top:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:stretch}
+    .field{flex:1 1 180px}
+    .field-label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:4px}
+    .code-input{width:100%;padding:10px 12px;border-radius:var(--radius-full);border:1px solid rgba(15,23,42,.09);background:rgba(255,255,255,.95);
+      font-size:14px;outline:none;transition:border .18s ease,box-shadow .18s ease,background .18s ease}
+    .code-input:focus{border-color:rgba(35,64,120,.6);box-shadow:0 0 0 1px rgba(35,64,120,.4),0 0 0 6px rgba(35,64,120,.08);background:#fff}
+    .btn-primary{padding:11px 18px;border-radius:var(--radius-full);border:none;background:linear-gradient(135deg,var(--ayda),var(--ayda-soft));color:#fff;
+      font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;box-shadow:0 14px 30px rgba(35,64,120,.45);white-space:nowrap;
+      transition:transform .12s ease,box-shadow .12s ease,background .12s ease}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 18px 38px rgba(35,64,120,.55)}
+    .btn-primary:active{transform:translateY(1px) scale(.98);box-shadow:0 8px 20px rgba(35,64,120,.45)}
+    .btn-icon{font-size:16px}
+    .gate-hint{margin-top:10px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+    .gate-hint-badge{padding:3px 8px;border-radius:var(--radius-full);background:rgba(15,23,42,.04);font-size:10px;font-weight:500;text-transform:uppercase}
+    .gate-right{border-radius:18px;border:1px dashed rgba(35,64,120,.22);padding:12px 12px 10px;background:linear-gradient(135deg,rgba(35,64,120,.08),rgba(35,64,120,.02))}
+    .mini-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#e5edff;margin-bottom:6px}
+    .mini-label{text-transform:uppercase;letter-spacing:.12em;font-size:10px;opacity:.8}
+    .mini-class{font-weight:600}
+    .mini-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+    .chip{font-size:11px;padding:5px 10px;border-radius:var(--radius-full);background:rgba(15,23,42,.24);color:#e5edff;display:inline-flex;align-items:center;gap:6px}
+    .chip-dot{width:7px;height:7px;border-radius:50%;background:#4ade80}
+    .mini-footer{margin-top:10px;font-size:11px;color:#dbe4ff;opacity:.8}
 
-    html, body {
-      margin:0;
-      padding:0;
-      font-family: system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      color:var(--ink);
-      background:radial-gradient(circle at top left,#fdfcff 0,#edf2ff 26%,#e4ecff 60%,#dde6ff 100%);
-      min-height:100vh;
-    }
+    /* Kütüphane layer */
+    .library{margin-top:18px;display:none;animation:fadeIn .2s ease-out forwards}
+    .library-inner{display:grid;grid-template-columns:minmax(0,270px) minmax(0,1fr);gap:18px}
+    .panel{background:rgba(255,255,255,.96);border-radius:18px;padding:14px 14px 12px;border:1px solid var(--border);box-shadow:var(--shadow-soft)}
+    .panel-title{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-bottom:6px}
+    .badge-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+    .badge-soft{font-size:11px;padding:4px 10px;border-radius:var(--radius-full);background:rgba(35,64,120,.06);color:var(--ayda)}
+    .section-label{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin:8px 0 6px}
+    .btn-grid{display:flex;flex-wrap:wrap;gap:8px}
+    .tab-btn,.view-btn,.filter-chip,.ghost-btn{border-radius:var(--radius-full);border:1px solid rgba(148,163,184,.6);padding:6px 12px;font-size:12px;background:#fff;color:#0f172a;
+      cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .16s ease,color .16s ease,box-shadow .16s ease,border-color .16s ease,transform .1s ease}
+    .tab-btn .emoji,.view-btn .emoji,.filter-chip .emoji{font-size:14px}
+    .tab-btn.active,.view-btn.active{background:linear-gradient(135deg,var(--ayda),var(--ayda-soft));color:#fff;border-color:transparent;box-shadow:0 12px 25px rgba(35,64,120,.55);transform:translateY(-1px)}
+    .filter-chip.active{background:rgba(35,64,120,.1);border-color:var(--ayda);color:var(--ayda)}
+    .tab-btn:hover:not(.active),.view-btn:hover:not(.active),.filter-chip:hover:not(.active),.ghost-btn:hover{background:rgba(148,163,184,.08)}
+    .panel-note{margin-top:10px;font-size:11px;color:var(--muted)}
+    .panel-note strong{color:var(--ayda)}
 
-    body {
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
-    }
+    /* Viewer */
+    .viewer-panel{display:flex;flex-direction:column;min-height:440px}
+    .viewer-header{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+    .viewer-title{font-size:15px;font-weight:600}
+    .viewer-meta{font-size:11px;color:var(--muted);margin-top:2px}
+    .viewer-status{font-size:11px;padding:4px 9px;border-radius:var(--radius-full);background:rgba(34,197,94,.08);color:#15803d;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+    .viewer-status-dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
 
-    .wrap {
-      width:100%;
-      max-width:1200px;
-      background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(244,246,252,.98));
-      box-shadow:var(--shadow-lg);
-      border-radius:26px;
-      padding:24px 22px 22px;
-      border:1px solid rgba(255,255,255,.6);
-      backdrop-filter:blur(20px);
-    }
-
-    header {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding:0 4px 12px;
-      border-bottom:1px solid rgba(35,64,120,.08);
-      margin-bottom:16px;
-    }
-
-    .brand {
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
-    .brand-logo {
-      width:38px;
-      height:38px;
-      border-radius:14px;
-      background:conic-gradient(from 210deg,var(--ayda),#3b82f6,#22c55e,var(--ayda));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#fff;
-      font-weight:700;
-      font-size:18px;
-      box-shadow:0 10px 25px rgba(35,64,120,.45);
-    }
-
-    .brand-text-title {
-      font-size:18px;
-      font-weight:700;
-      letter-spacing:.02em;
-    }
-
-    .brand-text-sub {
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    .pill {
-      font-size:11px;
-      padding:5px 10px;
-      border-radius:var(--radius-full);
-      background:rgba(35,64,120,.06);
-      color:var(--ayda);
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      white-space:nowrap;
-    }
-
-    .pill-dot {
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#22c55e;
-      box-shadow:0 0 0 4px rgba(34,197,94,.25);
-    }
-
-    /* MODULE: Giriş Kartı */
-
-    .gate {
-      display:grid;
-      grid-template-columns:minmax(0,1.1fr) minmax(0,1.1fr);
-      gap:22px;
-      padding:20px 18px 18px;
-      border-radius:22px;
-      background:radial-gradient(circle at top left,rgba(35,64,120,.1),transparent 55%),
-                 linear-gradient(135deg,#ffffff,rgba(255,255,255,.65));
-      box-shadow:var(--shadow-soft);
-    }
-
-    .gate-main-title {
-      font-size:20px;
-      font-weight:700;
-      margin-bottom:4px;
-    }
-
-    .gate-main-sub {
-      font-size:13px;
-      color:var(--muted);
-      max-width:360px;
-    }
-
-    .code-form {
-      margin-top:16px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:stretch;
-    }
-
-    .field {
-      flex:1 1 180px;
-    }
-
-    .field-label {
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      color:var(--muted);
-      margin-bottom:4px;
-    }
-
-    .code-input {
-      width:100%;
-      padding:10px 12px;
-      border-radius:var(--radius-full);
-      border:1px solid rgba(15,23,42,.09);
-      background:rgba(255,255,255,.95);
-      font-size:14px;
-      outline:none;
-      transition:border .18s ease, box-shadow .18s ease, background .18s ease;
-    }
-
-    .code-input:focus {
-      border-color:rgba(35,64,120,.6);
-      box-shadow:0 0 0 1px rgba(35,64,120,.4),0 0 0 6px rgba(35,64,120,.08);
-      background:#fff;
-    }
-
-    .btn-primary {
-      padding:11px 18px;
-      border-radius:var(--radius-full);
-      border:none;
-      outline:none;
-      background:linear-gradient(135deg,var(--ayda),var(--ayda-soft));
-      color:#fff;
-      font-size:14px;
-      font-weight:600;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      box-shadow:0 14px 30px rgba(35,64,120,.45);
-      white-space:nowrap;
-      transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
-    }
-
-    .btn-primary:hover {
-      transform:translateY(-1px);
-      box-shadow:0 18px 38px rgba(35,64,120,.55);
-    }
-
-    .btn-primary:active {
-      transform:translateY(1px) scale(.98);
-      box-shadow:0 8px 20px rgba(35,64,120,.45);
-    }
-
-    .btn-icon { font-size:16px; }
-
-    .gate-hint {
-      margin-top:10px;
-      font-size:11px;
-      color:var(--muted);
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-
-    .gate-hint-badge {
-      padding:3px 8px;
-      border-radius:var(--radius-full);
-      background:rgba(15,23,42,.04);
-      font-size:10px;
-      font-weight:500;
-      text-transform:uppercase;
-    }
-
-    .gate-right {
-      border-radius:18px;
-      border:1px dashed rgba(35,64,120,.22);
-      padding:12px 12px 10px;
-      background:linear-gradient(135deg,rgba(35,64,120,.08),rgba(35,64,120,.02));
-    }
-
-    .mini-row {
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      font-size:12px;
-      color:#e5edff;
-      margin-bottom:6px;
-    }
-
-    .mini-label {
-      text-transform:uppercase;
-      letter-spacing:.12em;
-      font-size:10px;
-      opacity:.8;
-    }
-
-    .mini-class { font-weight:600; }
-
-    .mini-tags {
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin-top:6px;
-    }
-
-    .chip {
-      font-size:11px;
-      padding:5px 10px;
-      border-radius:var(--radius-full);
-      background:rgba(15,23,42,.24);
-      color:#e5edff;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-
-    .chip-dot {
-      width:7px;
-      height:7px;
-      border-radius:50%;
-      background:#4ade80;
-    }
-
-    .mini-footer {
-      margin-top:10px;
-      font-size:11px;
-      color:#dbe4ff;
-      opacity:.8;
-    }
-
-    /* MODULE: Kütüphane Layer */
-
-    .library {
-      margin-top:18px;
-      display:none;
-      animation:fadeIn .2s ease-out forwards;
-    }
-
-    .library-inner {
-      display:grid;
-      grid-template-columns:minmax(0,270px) minmax(0,1fr);
-      gap:18px;
-    }
-
-    .panel {
-      background:rgba(255,255,255,.96);
-      border-radius:18px;
-      padding:14px 14px 12px;
-      border:1px solid var(--border);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .panel-title {
-      font-size:13px;
-      font-weight:600;
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .badge-row {
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin-bottom:4px;
-    }
-
-    .badge-soft {
-      font-size:11px;
-      padding:4px 10px;
-      border-radius:var(--radius-full);
-      background:rgba(35,64,120,.06);
-      color:var(--ayda);
-    }
-
-    .section-label {
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.16em;
-      color:var(--muted);
-      margin:8px 0 6px;
-    }
-
-    .btn-grid {
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .tab-btn,
-    .view-btn,
-    .filter-chip {
-      border-radius:var(--radius-full);
-      border:1px solid rgba(148,163,184,.6);
-      padding:6px 12px;
-      font-size:12px;
-      background:#fff;
-      color:#0f172a;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      transition:background .16s ease, color .16s ease, box-shadow .16s ease, border-color .16s ease, transform .1s ease;
-    }
-
-    .tab-btn .emoji,
-    .view-btn .emoji,
-    .filter-chip .emoji {
-      font-size:14px;
-    }
-
-    .tab-btn.active,
-    .view-btn.active {
-      background:linear-gradient(135deg,var(--ayda),var(--ayda-soft));
-      color:#fff;
-      border-color:transparent;
-      box-shadow:0 12px 25px rgba(35,64,120,.55);
-      transform:translateY(-1px);
-    }
-
-    .filter-chip.active {
-      background:rgba(35,64,120,.1);
-      border-color:var(--ayda);
-      color:var(--ayda);
-    }
-
-    .tab-btn:hover:not(.active),
-    .view-btn:hover:not(.active),
-    .filter-chip:hover:not(.active) {
-      background:rgba(148,163,184,.08);
-    }
-
-    .panel-note {
-      margin-top:10px;
-      font-size:11px;
-      color:var(--muted);
-    }
-
-    .panel-note strong { color:var(--ayda); }
-
-    /* MODULE: Sağ Panel & Viewer */
-
-    .viewer-panel {
-      display:flex;
-      flex-direction:column;
-      min-height:440px;
-    }
-
-    .viewer-header {
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:10px;
-      margin-bottom:6px;
-    }
-
-    .viewer-title {
-      font-size:15px;
-      font-weight:600;
-    }
-
-    .viewer-meta {
-      font-size:11px;
-      color:var(--muted);
-      margin-top:2px;
-    }
-
-    .viewer-status {
-      font-size:11px;
-      padding:4px 9px;
-      border-radius:var(--radius-full);
-      background:rgba(34,197,94,.08);
-      color:#15803d;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      white-space:nowrap;
-    }
-
-    .viewer-status-dot {
-      width:7px;
-      height:7px;
-      border-radius:50%;
-      background:#22c55e;
-    }
-
-    /* Arama alanı */
-
-    .search-row {
-      margin:6px 0 4px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-
-    .search-input {
-      flex:1;
-      padding:7px 10px;
-      border-radius:var(--radius-full);
-      border:1px solid rgba(148,163,184,.7);
-      font-size:11px;
-      outline:none;
-      background:#f9fafb;
-      transition:border .16s ease, box-shadow .16s ease, background .16s ease;
-    }
-
-    .search-input:focus {
-      background:#fff;
-      border-color:rgba(35,64,120,.7);
-      box-shadow:0 0 0 1px rgba(35,64,120,.45),0 0 0 5px rgba(35,64,120,.08);
-    }
-
-    .search-icon {
-      font-size:14px;
-      opacity:.6;
-    }
+    /* Arama */
+    .search-row{margin:6px 0 4px;display:flex;align-items:center;gap:8px}
+    .search-input{flex:1;padding:7px 10px;border-radius:var(--radius-full);border:1px solid rgba(148,163,184,.7);font-size:11px;outline:none;background:#f9fafb;
+      transition:border .16s ease,box-shadow .16s ease,background .16s ease}
+    .search-input:focus{background:#fff;border-color:rgba(35,64,120,.7);box-shadow:0 0 0 1px rgba(35,64,120,.45),0 0 0 5px rgba(35,64,120,.08)}
+    .search-icon{font-size:14px;opacity:.6}
 
     /* Son açılanlar */
+    .recent-row{margin:4px 0 6px;font-size:11px;color:var(--muted)}
+    .recent-title{text-transform:uppercase;letter-spacing:.14em;font-size:10px;margin-bottom:3px}
+    .recent-chips{display:flex;flex-wrap:wrap;gap:4px}
+    .recent-chip{border-radius:var(--radius-full);border:1px dashed rgba(148,163,184,.6);padding:3px 8px;font-size:10px;background:#f9fafb;color:#0f172a;cursor:pointer;
+      max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-    .recent-row {
-      margin:4px 0 6px;
-      font-size:11px;
-      color:var(--muted);
+    .resource-chips{margin:8px 0 10px;display:flex;flex-wrap:wrap;gap:6px}
+    .resource-chip{border-radius:var(--radius-full);border:1px solid rgba(148,163,184,.6);padding:4px 10px;font-size:11px;background:#fff;color:#0f172a;cursor:pointer;white-space:nowrap}
+    .resource-chip.active{background:rgba(35,64,120,.08);border-color:var(--ayda);color:var(--ayda)}
+
+    /* Iframe */
+    .iframe-shell{flex:1;border-radius:16px;overflow:hidden;border:1px solid rgba(148,163,184,.45);
+      background:repeating-linear-gradient(45deg,rgba(148,163,184,.12),rgba(148,163,184,.12) 10px,rgba(226,232,240,.6) 10px,rgba(226,232,240,.6) 20px);
+      position:relative;min-height:340px;margin-top:4px}
+    iframe{width:100%;height:100%;border:none;background:#fff}
+    .hint-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;padding:18px}
+    .hint-box{max-width:360px;background:rgba(15,23,42,.9);color:#e5e7eb;border-radius:16px;padding:14px 16px;font-size:12px;box-shadow:0 18px 45px rgba(15,23,42,.7)}
+    .hint-box strong{color:#f9fafb}
+    .hint-box small{display:block;margin-top:4px;font-size:11px;color:#9ca3af}
+
+    .hidden{display:none !important}
+    .error-text{margin-top:6px;font-size:11px;color:#b91c1c}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+    /* Collapsible (filtre paneli) */
+    .collapsible{display:grid;grid-template-rows:0fr;opacity:.0;overflow:hidden;transition:grid-template-rows .25s ease,opacity .25s ease}
+    .collapsible.open{grid-template-rows:1fr;opacity:1}
+    .collapsible-inner{min-height:0}
+
+    .filter-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .btn-apply{background:linear-gradient(135deg,var(--ayda),var(--ayda-soft));color:#fff;border:none}
+    .btn-clear{background:#fff;color:#0f172a;border:1px solid rgba(148,163,184,.6)}
+    .btn-apply,.btn-clear{padding:7px 12px;border-radius:var(--radius-full);font-size:12px;cursor:pointer}
+
+    /* Alt sabit buton */
+    .help-fab{position:fixed;right:16px;bottom:16px;z-index:50;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+    .fab-btn{padding:12px 14px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--ayda),var(--ayda-soft));color:#fff;
+      box-shadow:0 12px 28px rgba(35,64,120,.35);cursor:pointer;font-weight:600;font-size:13px;display:flex;align-items:center;gap:8px}
+    .fab-menu{background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.08);padding:8px;display:none}
+    .fab-menu a{display:block;text-decoration:none;color:#0f172a;font-size:13px;padding:8px 10px;border-radius:10px}
+    .fab-menu a:hover{background:#f3f4f6}
+
+    @media (max-width:900px){
+      .wrap{padding:18px 14px 14px;border-radius:20px}
+      .gate{grid-template-columns:minmax(0,1fr)}
+      .library-inner{grid-template-columns:minmax(0,1fr)}
     }
-
-    .recent-title {
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      font-size:10px;
-      margin-bottom:3px;
-    }
-
-    .recent-chips {
-      display:flex;
-      flex-wrap:wrap;
-      gap:4px;
-    }
-
-    .recent-chip {
-      border-radius:var(--radius-full);
-      border:1px dashed rgba(148,163,184,.6);
-      padding:3px 8px;
-      font-size:10px;
-      background:#f9fafb;
-      color:#0f172a;
-      cursor:pointer;
-      max-width:100%;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-
-    .resource-chips {
-      margin:8px 0 10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-    }
-
-    .resource-chip {
-      border-radius:var(--radius-full);
-      border:1px solid rgba(148,163,184,.6);
-      padding:4px 10px;
-      font-size:11px;
-      background:#fff;
-      color:#0f172a;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-
-    .resource-chip.active {
-      background:rgba(35,64,120,.08);
-      border-color:var(--ayda);
-      color:var(--ayda);
-    }
-
-    /* MODULE: Iframe Shell */
-
-    .iframe-shell {
-      flex:1;
-      border-radius:16px;
-      overflow:hidden;
-      border:1px solid rgba(148,163,184,.45);
-      background:repeating-linear-gradient(
-        45deg,
-        rgba(148,163,184,.12),
-        rgba(148,163,184,.12) 10px,
-        rgba(226,232,240,.6) 10px,
-        rgba(226,232,240,.6) 20px
-      );
-      position:relative;
-      min-height:340px;
-      margin-top:4px;
-    }
-
-    iframe {
-      width:100%;
-      height:100%;
-      border:none;
-      background:#fff;
-    }
-
-    .hint-overlay {
-      position:absolute;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      pointer-events:none;
-      padding:18px;
-    }
-
-    .hint-box {
-      max-width:360px;
-      background:rgba(15,23,42,.9);
-      color:#e5e7eb;
-      border-radius:16px;
-      padding:14px 16px;
-      font-size:12px;
-      box-shadow:0 18px 45px rgba(15,23,42,.7);
-    }
-
-    .hint-box strong { color:#f9fafb; }
-
-    .hint-box small {
-      display:block;
-      margin-top:4px;
-      font-size:11px;
-      color:#9ca3af;
-    }
-
-    .hidden { display:none !important; }
-
-    .error-text {
-      margin-top:6px;
-      font-size:11px;
-      color:#b91c1c;
-    }
-
-    @keyframes fadeIn {
-      from { opacity:0; transform:translateY(6px); }
-      to { opacity:1; transform:translateY(0); }
-    }
-
-    @media (max-width:900px) {
-      .wrap { padding:18px 14px 14px; border-radius:20px; }
-      .gate { grid-template-columns:minmax(0,1fr); }
-      .library-inner { grid-template-columns:minmax(0,1fr); }
-    }
-
-    @media (max-width:600px) {
-      header {
-        flex-direction:column;
-        align-items:flex-start;
-      }
-      .viewer-header {
-        flex-direction:column;
-        align-items:flex-start;
-      }
-      .iframe-shell { min-height:300px; }
+    @media (max-width:600px){
+      header{flex-direction:column;align-items:flex-start}
+      .viewer-header{flex-direction:column;align-items:flex-start}
+      .iframe-shell{min-height:300px}
     }
   </style>
 </head>
@@ -622,45 +155,26 @@
         <div class="brand-text-sub">Seviyeye göre Almanca materyaller ve tekrar videoları</div>
       </div>
     </div>
-    <div class="pill">
-      <span class="pill-dot"></span>
-      <span>Tek sayfadan tüm kaynaklar</span>
-    </div>
+    <div class="pill"><span class="pill-dot"></span><span>Tek sayfadan tüm kaynaklar</span></div>
   </header>
 
-  <!-- Sınıf Kodu Girişi -->
+  <!-- Giriş -->
   <section class="gate" id="gateSection">
     <div>
       <div class="gate-main-title">Sınıf kodunu gir, kütüphaneye bağlan</div>
-      <div class="gate-main-sub">
-        Seçtiğin sınıf için <strong>ders materyali, okuma–dinleme–yazma–konuşma</strong> çalışmaları,
-        <strong>sınav hazırlık</strong> ve <strong>ders tekrar videoları</strong> tek ekranda.
-      </div>
+      <div class="gate-main-sub">Seçtiğin sınıf için <strong>ders materyali, okuma–dinleme–yazma–konuşma</strong> çalışmaları,
+        <strong>sınav hazırlık</strong> ve <strong>ders tekrar videoları</strong> tek ekranda.</div>
 
       <form class="code-form" onsubmit="event.preventDefault(); unlockLibrary();">
         <div class="field">
           <div class="field-label">Sınıf kodu</div>
-          <input
-            id="classCodeInput"
-            type="password"
-            class="code-input"
-            placeholder="Örn: a1kasim2025"
-            autocomplete="off"
-          />
+          <input id="classCodeInput" type="password" class="code-input" placeholder="Örn: a1kasim2025" autocomplete="off"/>
         </div>
-        <button type="submit" class="btn-primary">
-          <span class="btn-icon">🔓</span>
-          <span>Kütüphaneye giriş yap</span>
-        </button>
+        <button type="submit" class="btn-primary"><span class="btn-icon">🔓</span><span>Kütüphaneye giriş yap</span></button>
       </form>
 
-      <div class="gate-hint">
-        <span class="gate-hint-badge">BİLGİ</span>
-        <span>Sınıf kodun yoksa AYDA ekibine veya sınıf öğretmenine yaz.</span>
-      </div>
-      <div id="errorText" class="error-text hidden">
-        Kod hatalı görünüyor. Lütfen sınıf öğretmeninden aldığın kodu tekrar kontrol et.
-      </div>
+      <div class="gate-hint"><span class="gate-hint-badge">BİLGİ</span><span>Sınıf kodun yoksa AYDA ekibine veya sınıf öğretmenine yaz.</span></div>
+      <div id="errorText" class="error-text hidden">Kod hatalı görünüyor. Lütfen sınıf öğretmeninden aldığın kodu tekrar kontrol et.</div>
     </div>
 
     <div class="gate-right">
@@ -669,10 +183,7 @@
           <div class="mini-label">Örnek sınıf kodu</div>
           <div class="mini-class">a1kasim2025</div>
         </div>
-        <div class="chip">
-          <span class="chip-dot"></span>
-          <span>Aktif dönem</span>
-        </div>
+        <div class="chip"><span class="chip-dot"></span><span>Aktif dönem</span></div>
       </div>
       <div class="mini-tags">
         <div class="chip">📚 Ders materyalleri</div>
@@ -680,14 +191,11 @@
         <div class="chip">✍️ Yazma &amp; okuma</div>
         <div class="chip">🎯 Sınav hazırlık</div>
       </div>
-      <div class="mini-footer">
-        Girişten sonra önce <strong>seviye</strong>yi, sonra <strong>kategori</strong>leri seç;
-        sağdaki listeden tıkladığında içerik aşağıdaki pencerede açılır.
-      </div>
+      <div class="mini-footer">Girişten sonra önce <strong>seviye</strong>yi, sonra <strong>kategori</strong>leri seç; sağdaki listeden tıkladığında içerik aşağıdaki pencerede açılır.</div>
     </div>
   </section>
 
-  <!-- Kütüphane Arayüzü -->
+  <!-- Kütüphane -->
   <section class="library" id="librarySection">
     <div class="library-inner">
       <!-- Sol panel -->
@@ -700,83 +208,57 @@
 
         <div class="section-label">1 · Seviye seç</div>
         <div class="btn-grid">
-          <button class="tab-btn level-btn active" data-level="A1" onclick="selectLevel(event)">
-            <span class="emoji">A1</span><span>Başlangıç</span>
-          </button>
-          <button class="tab-btn level-btn" data-level="A2" onclick="selectLevel(event)">
-            <span class="emoji">A2</span><span>Temel</span>
-          </button>
-          <button class="tab-btn level-btn" data-level="B1" onclick="selectLevel(event)">
-            <span class="emoji">B1</span><span>Orta</span>
-          </button>
-          <button class="tab-btn level-btn" data-level="B2" onclick="selectLevel(event)">
-            <span class="emoji">B2</span><span>Üst orta</span>
-          </button>
-          <button class="tab-btn level-btn" data-level="SINAV" onclick="selectLevel(event)">
-            <span class="emoji">🎯</span><span>Sınav hazırlık</span>
-          </button>
+          <button class="tab-btn level-btn active" data-level="A1" onclick="selectLevel(event)"><span class="emoji">A1</span><span>Başlangıç</span></button>
+          <button class="tab-btn level-btn" data-level="A2" onclick="selectLevel(event)"><span class="emoji">A2</span><span>Temel</span></button>
+          <button class="tab-btn level-btn" data-level="B1" onclick="selectLevel(event)"><span class="emoji">B1</span><span>Orta</span></button>
+          <button class="tab-btn level-btn" data-level="B2" onclick="selectLevel(event)"><span class="emoji">B2</span><span>Üst orta</span></button>
+          <button class="tab-btn level-btn" data-level="SINAV" onclick="selectLevel(event)"><span class="emoji">🎯</span><span>Sınav hazırlık</span></button>
         </div>
 
         <div class="section-label">2 · Görünüm</div>
         <div class="btn-grid">
-          <button class="view-btn active" data-mode="kategori" onclick="selectViewMode(event)">
-            <span class="emoji">🎛️</span><span>Kategori filtresi</span>
-          </button>
-          <button class="view-btn" data-mode="liste" onclick="selectViewMode(event)">
-            <span class="emoji">📋</span><span>Tam liste</span>
-          </button>
+          <button class="view-btn active" data-mode="kategori" onclick="selectViewMode(event)"><span class="emoji">🎛️</span><span>Kategori filtresi</span></button>
+          <button class="view-btn" data-mode="liste" onclick="selectViewMode(event)"><span class="emoji">📋</span><span>Tam liste</span></button>
         </div>
 
-        <div id="filterSection">
-          <div class="section-label">3 · Kategori filtreleri (isteğe bağlı)</div>
-          <div class="btn-grid">
-            <button class="filter-chip" data-tag="ders" onclick="toggleFilterTag(event)">
-              <span class="emoji">📚</span><span>Ders materyali</span>
-            </button>
-            <button class="filter-chip" data-tag="video" onclick="toggleFilterTag(event)">
-              <span class="emoji">▶️</span><span>Ders videoları / tekrar</span>
-            </button>
-            <button class="filter-chip" data-tag="ek" onclick="toggleFilterTag(event)">
-              <span class="emoji">🧩</span><span>Ek materyal / yararlı</span>
-            </button>
-            <button class="filter-chip" data-tag="konu" onclick="toggleFilterTag(event)">
-              <span class="emoji">📌</span><span>Konu anlatım</span>
-            </button>
-            <button class="filter-chip" data-tag="okuma" onclick="toggleFilterTag(event)">
-              <span class="emoji">📖</span><span>Okuma / metin</span>
-            </button>
-            <button class="filter-chip" data-tag="quizlet" onclick="toggleFilterTag(event)">
-              <span class="emoji">🔤</span><span>Kelime &amp; Quizlet</span>
-            </button>
-            <button class="filter-chip" data-tag="online" onclick="toggleFilterTag(event)">
-              <span class="emoji">🌐</span><span>Online alıştırmalar</span>
-            </button>
-            <button class="filter-chip" data-tag="dinleme" onclick="toggleFilterTag(event)">
-              <span class="emoji">🎧</span><span>Dinleme yardımı</span>
-            </button>
-            <button class="filter-chip" data-tag="muzik" onclick="toggleFilterTag(event)">
-              <span class="emoji">🎵</span><span>Müzik playlist</span>
-            </button>
-            <button class="filter-chip" data-tag="nicos" onclick="toggleFilterTag(event)">
-              <span class="emoji">🎬</span><span>Nicos Weg</span>
-            </button>
-            <button class="filter-chip" data-tag="dergi" onclick="toggleFilterTag(event)">
-              <span class="emoji">📰</span><span>Dergi &amp; gazete</span>
-            </button>
-            <button class="filter-chip" data-tag="kitap" onclick="toggleFilterTag(event)">
-              <span class="emoji">📘</span><span>Kitap / PDF</span>
-            </button>
-            <button class="filter-chip" data-tag="genel" onclick="toggleFilterTag(event)">
-              <span class="emoji">ℹ️</span><span>Genel bilgi</span>
-            </button>
+        <!-- Filtre panelini aç/kapa -->
+        <div class="section-label">3 · Kategoriler</div>
+        <button id="filterToggleBtn" class="ghost-btn" type="button" onclick="toggleFilterPanel()" aria-expanded="false">
+          🔍 Kategorileri düzenle
+        </button>
+
+        <!-- Collapsible filtre bölümü -->
+        <div id="filterSectionWrap" class="collapsible">
+          <div class="collapsible-inner">
+            <div id="filterSection" class="">
+              <div class="btn-grid" style="margin-top:8px">
+                <button class="filter-chip" data-tag="ders" onclick="toggleFilterTag(event)"><span class="emoji">📚</span><span>Ders materyali</span></button>
+                <button class="filter-chip" data-tag="video" onclick="toggleFilterTag(event)"><span class="emoji">▶️</span><span>Ders videoları / tekrar</span></button>
+                <button class="filter-chip" data-tag="ek" onclick="toggleFilterTag(event)"><span class="emoji">🧩</span><span>Ek materyal</span></button>
+                <button class="filter-chip" data-tag="konu" onclick="toggleFilterTag(event)"><span class="emoji">📌</span><span>Konu anlatım</span></button>
+                <button class="filter-chip" data-tag="okuma" onclick="toggleFilterTag(event)"><span class="emoji">📖</span><span>Okuma / metin</span></button>
+                <button class="filter-chip" data-tag="quizlet" onclick="toggleFilterTag(event)"><span class="emoji">🔤</span><span>Kelime &amp; Quizlet</span></button>
+                <button class="filter-chip" data-tag="online" onclick="toggleFilterTag(event)"><span class="emoji">🌐</span><span>Online alıştırmalar</span></button>
+                <button class="filter-chip" data-tag="dinleme" onclick="toggleFilterTag(event)"><span class="emoji">🎧</span><span>Dinleme yardımı</span></button>
+                <button class="filter-chip" data-tag="muzik" onclick="toggleFilterTag(event)"><span class="emoji">🎵</span><span>Müzik playlist</span></button>
+                <button class="filter-chip" data-tag="nicos" onclick="toggleFilterTag(event)"><span class="emoji">🎬</span><span>Nicos Weg</span></button>
+                <button class="filter-chip" data-tag="dergi" onclick="toggleFilterTag(event)"><span class="emoji">📰</span><span>Dergi &amp; gazete</span></button>
+                <button class="filter-chip" data-tag="kitap" onclick="toggleFilterTag(event)"><span class="emoji">📘</span><span>Kitap / PDF</span></button>
+                <button class="filter-chip" data-tag="genel" onclick="toggleFilterTag(event)"><span class="emoji">ℹ️</span><span>Genel bilgi</span></button>
+              </div>
+
+              <div class="filter-actions">
+                <button class="btn-apply" type="button" onclick="applyFilters()">Uygula / Ara</button>
+                <button class="btn-clear" type="button" onclick="clearFilters()">Temizle</button>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="panel-note">
           <strong>Kullanım:</strong><br>
-          1) Seviyeni seç (A1–B2 veya Sınav hazırlık).<br>
-          2) İstersen kategori filtrelerinden birden fazlasını seç.<br>
-          3) Sağdaki listeden istediğin kaynağa tıkla; altta iframe’de açılır.
+          1) Seviye (A1–B2 / Sınav) → 2) Görünüm → 3) Kategorileri seç &amp; <strong>Uygula</strong>.<br>
+          Uyguladıktan sonra panel kapanır; tekrar açmak için “Kategorileri düzenle”.
         </div>
       </aside>
 
@@ -785,25 +267,15 @@
         <div class="viewer-header">
           <div>
             <div class="viewer-title" id="viewerTitle">A1 · Kategori filtresi</div>
-            <div class="viewer-meta" id="viewerMeta">
-              A1 seviyesi için tüm materyaller listeleniyor. Filtreleri kullanarak daraltabilirsin.
-            </div>
+            <div class="viewer-meta" id="viewerMeta">A1 seviyesi için tüm materyaller listeleniyor. Filtreleri kullanarak daraltabilirsin.</div>
           </div>
-          <div class="viewer-status">
-            <span class="viewer-status-dot"></span>
-            <span>Kütüphane açık</span>
-          </div>
+          <div class="viewer-status"><span class="viewer-status-dot"></span><span>Kütüphane açık</span></div>
         </div>
 
-        <!-- Arama alanı -->
+        <!-- Arama -->
         <div class="search-row">
           <span class="search-icon">🔍</span>
-          <input
-            id="searchInput"
-            class="search-input"
-            type="search"
-            placeholder="Kaynak ara (örn: Quizlet, B1-B2 okuma, Nicos Weg, müzik...)"
-          />
+          <input id="searchInput" class="search-input" type="search" placeholder="Kaynak ara (örn: Quizlet, B1-B2 okuma, Nicos Weg, müzik...)"/>
         </div>
 
         <!-- Son açılanlar -->
@@ -819,10 +291,7 @@
           <div class="hint-overlay" id="hintOverlay">
             <div class="hint-box">
               <strong>Bu seviye için henüz kaynak eklenmedi veya filtreler çok dar.</strong>
-              <small>
-                Filtreleri kaldırabilir veya farklı bir seviye seçebilirsin. Yeni link eklemek istersen
-                JavaScript bölümündeki <code>CONTENT</code> dizisine yeni satır eklemen yeterli.
-              </small>
+              <small>Filtreleri kaldırabilir veya farklı bir seviye seçebilirsin. Yeni link eklemek için JS’teki <code>CONTENT</code> dizisine öğe eklemen yeterli.</small>
             </div>
           </div>
         </div>
@@ -831,514 +300,301 @@
   </section>
 </div>
 
+<!-- ALT SABİT “Mesaj At” -->
+<div class="help-fab" id="helpFab" aria-live="polite">
+  <div class="fab-menu" id="fabMenu" role="menu" aria-hidden="true">
+    <a id="waLink" href="#" target="_blank" rel="noopener" role="menuitem">WhatsApp ile ilet</a>
+    <a id="smsLink" href="#" role="menuitem">SMS ile ilet</a>
+  </div>
+  <button class="fab-btn" type="button" id="fabBtn">📩 Aradığım kaynağı bulamadım veya bir sorunla karşılaştım </button>
+</div>
+
 <script>
   // ==== ŞİFRE (Sınıf kodu) ====
-  // Burayı istediğin sınıf koduyla değiştir:
   const CLASS_CODE = "a1kasim2025";
 
-  const LEVEL_LABELS = {
-    A1: "A1",
-    A2: "A2",
-    B1: "B1",
-    B2: "B2",
-    SINAV: "Sınav hazırlık"
-  };
+  const LEVEL_LABELS = {A1:"A1",A2:"A2",B1:"B1",B2:"B2",SINAV:"Sınav hazırlık"};
 
   // ==== TÜM KAYNAKLAR ====
-  // level -> [ { label, url, tags:[...]} ]
   const CONTENT = {
-    A1: [
-      {
-        label: "A1 Ders Materyalleri (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1EhcIIju4RZyB5HfcccAF6q8nHIou2uwT#grid",
-        tags: ["ders"]
-      },
-      {
-        label: "A1 Menschen Ders Videoları (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1mv_Crm7n8s1javra-rW4a7fGz6PkFjQZ#grid",
-        tags: ["video"]
-      },
-      {
-        label: "A1 Ek Materyal (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1vxr47d-wdfN6bBQfUJwKXvmv4luPiasq#grid",
-        tags: ["ek"]
-      },
-      {
-        label: "Ders Kayıtlarını Nasıl İzlerim & Materyalleri Nereden İndirebilirim? (YouTube)",
-        url: "https://www.youtube.com/embed/cw9jcwIXv6g",
-        tags: ["genel", "video"]
-      },
-      {
-        label: "Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",
-        url: "https://www.youtube.com/embed/SgLBimupSIU",
-        tags: ["dinleme", "video"]
-      },
-      {
-        label: "A1 Cümle Kalıpları (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1VAz1AtWp4RDmmRddSZwqQr5XtfszjkOS#grid",
-        tags: ["ek", "konu"]
-      },
-      {
-        label: "YouTube Almanca Müzikler Playlist",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGaC8tkVghThkGQ_L-QkYY0",
-        tags: ["muzik"]
-      },
-      {
-        label: "Nicos Weg A1 (DW interaktif kurs)",
-        url: "https://learngerman.dw.com/tr/nicos-weg/c-54846011",
-        tags: ["nicos", "online"]
-      },
-      {
-        label: "Quizlet · A1 Menschen Kelime Alıştırmaları",
-        url: "https://quizlet.com/onurqlp/folders/menschen-a1?x=1xqt&i=3m8fpg",
-        tags: ["quizlet"]
-      },
-      {
-        label: "Menschen Online Alıştırmalar · Genel",
-        url: "https://www.hueber.de/menschen/lernen/uebungen",
-        tags: ["online"]
-      },
-      {
-        label: "Menschen Online Alıştırmalar · Arbeitsbuch",
-        url: "https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",
-        tags: ["online"]
-      },
-      {
-        label: "A1 Kısa Konu Anlatımları · Ünite 1–3",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZFg8jGfuZqcMvQEPS6Dubaj",
-        tags: ["konu", "video"]
-      },
-      {
-        label: "A1 Kısa Konu Anlatımları · Ünite 3–9",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZFaNGGwJVk4Y2F4moEsCY76",
-        tags: ["konu", "video"]
-      },
-      {
-        label: "A1 Kısa Konu Anlatımları · Ünite 10–12",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZHrt1mHEz_heegM9KlCfeVw",
-        tags: ["konu", "video"]
-      },
-      {
-        label: "A1 Kısa Konu Anlatımları · Ünite 13–18",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGZv5oqWOqn-MUNvMa6d_JQ",
-        tags: ["konu", "video"]
-      },
-      {
-        label: "A1 Kısa Konu Anlatımları · Ünite 18–24",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZHcKC5tsXwGulBB3SDj6bcp",
-        tags: ["konu", "video"]
-      }
+    A1:[
+      {label:"A1 Ders Materyalleri (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1EhcIIju4RZyB5HfcccAF6q8nHIou2uwT#grid",tags:["ders"]},
+      {label:"A1 Menschen Ders Videoları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1mv_Crm7n8s1javra-rW4a7fGz6PkFjQZ#grid",tags:["video"]},
+      {label:"A1 Ek Materyal (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1vxr47d-wdfN6bBQfUJwKXvmv4luPiasq#grid",tags:["ek"]},
+      {label:"Ders Kayıtlarını Nasıl İzlerim & Materyalleri Nereden İndirebilirim? (YouTube)",url:"https://www.youtube.com/embed/cw9jcwIXv6g",tags:["genel","video"]},
+      {label:"Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",url:"https://www.youtube.com/embed/SgLBimupSIU",tags:["dinleme","video"]},
+      {label:"A1 Cümle Kalıpları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1VAz1AtWp4RDmmRddSZwqQr5XtfszjkOS#grid",tags:["ek","konu"]},
+      {label:"YouTube Almanca Müzikler Playlist",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGaC8tkVghThkGQ_L-QkYY0",tags:["muzik"]},
+      {label:"Nicos Weg A1 (DW interaktif kurs)",url:"https://learngerman.dw.com/tr/nicos-weg/c-54846011",tags:["nicos","online"]},
+      {label:"Quizlet · A1 Menschen Kelime Alıştırmaları",url:"https://quizlet.com/onurqlp/folders/menschen-a1?x=1xqt&i=3m8fpg",tags:["quizlet"]},
+      {label:"Menschen Online Alıştırmalar · Genel",url:"https://www.hueber.de/menschen/lernen/uebungen",tags:["online"]},
+      {label:"Menschen Online Alıştırmalar · Arbeitsbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",tags:["online"]},
+      {label:"A1 Kısa Konu Anlatımları · Ünite 1–3",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZFg8jGfuZqcMvQEPS6Dubaj",tags:["konu","video"]},
+      {label:"A1 Kısa Konu Anlatımları · Ünite 3–9",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZFaNGGwJVk4Y2F4moEsCY76",tags:["konu","video"]},
+      {label:"A1 Kısa Konu Anlatımları · Ünite 10–12",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZHrt1mHEz_heegM9KlCfeVw",tags:["konu","video"]},
+      {label:"A1 Kısa Konu Anlatımları · Ünite 13–18",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGZv5oqWOqn-MUNvMa6d_JQ",tags:["konu","video"]},
+      {label:"A1 Kısa Konu Anlatımları · Ünite 18–24",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZHcKC5tsXwGulBB3SDj6bcp",tags:["konu","video"]}
     ],
-
-    A2: [
-      {
-        label: "A2 Ders Materyalleri / Yararlı Materyaller (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1eRkHhSQ0cVnbMVOtvR-nDcOZRUFJOEKH#grid",
-        tags: ["ders", "ek"]
-      },
-      {
-        label: "A2 Menschen Ders Videoları (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=10KGAPnOKlfd3trMtY4paFsJDCbGNok9k#grid",
-        tags: ["video"]
-      },
-      {
-        label: "Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",
-        url: "https://www.youtube.com/embed/GHf6eOr6MU0",
-        tags: ["dinleme", "video"]
-      },
-      {
-        label: "A2 Konuşma Kalıpları (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1v1KnsUELnxaqwKEhN_8ruqGDOkHbrYFG#grid",
-        tags: ["konu", "ek"]
-      },
-      {
-        label: "A2 Konu Anlatım Videoları (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1dkvJRQmwMAy4-xima2GhujCnFhRwq63B#grid",
-        tags: ["konu", "video"]
-      },
-      {
-        label: "YouTube Almanca Müzikler Playlist",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGaC8tkVghThkGQ_L-QkYY0",
-        tags: ["muzik"]
-      },
-      {
-        label: "Quizlet · A2 Menschen Kelime Alıştırmaları",
-        url: "https://quizlet.com/Saalihyilmazz/folders/menschen-a2?i=195vch&x=1xqY",
-        tags: ["quizlet"]
-      },
-      {
-        label: "Menschen Online Alıştırmalar · Kursbuch",
-        url: "https://www.hueber.de/menschen/lernen/uebungen?bestandteil=kursbuch",
-        tags: ["online"]
-      },
-      {
-        label: "Menschen Online Alıştırmalar · Arbeitsbuch",
-        url: "https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",
-        tags: ["online"]
-      }
+    A2:[
+      {label:"A2 Ders Materyalleri / Yararlı Materyaller (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1eRkHhSQ0cVnbMVOtvR-nDcOZRUFJOEKH#grid",tags:["ders","ek"]},
+      {label:"A2 Menschen Ders Videoları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=10KGAPnOKlfd3trMtY4paFsJDCbGNok9k#grid",tags:["video"]},
+      {label:"Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",url:"https://www.youtube.com/embed/GHf6eOr6MU0",tags:["dinleme","video"]},
+      {label:"A2 Konuşma Kalıpları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1v1KnsUELnxaqwKEhN_8ruqGDOkHbrYFG#grid",tags:["konu","ek"]},
+      {label:"A2 Konu Anlatım Videoları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1dkvJRQmwMAy4-xima2GhujCnFhRwq63B#grid",tags:["konu","video"]},
+      {label:"YouTube Almanca Müzikler Playlist",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGaC8tkVghThkGQ_L-QkYY0",tags:["muzik"]},
+      {label:"Quizlet · A2 Menschen Kelime Alıştırmaları",url:"https://quizlet.com/Saalihyilmazz/folders/menschen-a2?i=195vch&x=1xqY",tags:["quizlet"]},
+      {label:"Menschen Online Alıştırmalar · Kursbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=kursbuch",tags:["online"]},
+      {label:"Menschen Online Alıştırmalar · Arbeitsbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",tags:["online"]}
     ],
-
-    B1: [
-      {
-        label: "B1 Ders Dosyaları (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1-4HicuJ5pDdyZim4mT_2ougN2v-vEwPD#grid",
-        tags: ["ders"]
-      },
-      {
-        label: "B1 Yararlı Videolar ve Materyaller (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1AnFbEW5pq2G6_7y2tA1-EReVj_LBibTm#grid",
-        tags: ["ek", "video"]
-      },
-      {
-        label: "B1 Bilgilendirme Dokümanı (Google Docs)",
-        url: "https://docs.google.com/document/d/1__fPtBM9tD_eNiaz88XTlO1VS-6P3ophA3x4FJyirXE/preview",
-        tags: ["genel", "ders"]
-      },
-      {
-        label: "Almanca Dergi & Gazete (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1fvIHKArOr8QCOryBSK7-BdXNZmb04XNU#grid",
-        tags: ["okuma", "dergi"]
-      },
-      {
-        label: "B1–B2 Okuma Metinleri (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1Db5TITLZrBDc01FptVUm0_VoLDdSVG3x#grid",
-        tags: ["okuma"]
-      },
-      {
-        label: "Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",
-        url: "https://www.youtube.com/embed/GHf6eOr6MU0",
-        tags: ["dinleme", "video"]
-      },
-      {
-        label: "Menschen Online Alıştırmalar · Kursbuch",
-        url: "https://www.hueber.de/menschen/lernen/uebungen?bestandteil=kursbuch",
-        tags: ["online"]
-      },
-      {
-        label: "Menschen Online Alıştırmalar · Arbeitsbuch",
-        url: "https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",
-        tags: ["online"]
-      },
-      {
-        label: "Kitap · B1/B2 (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1nwBOKfm6XL5TQZKNpQTonkJ21Qe5oF-w#grid",
-        tags: ["kitap", "ders"]
-      },
-      {
-        label: "YouTube Almanca Müzikler Playlist",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGaC8tkVghThkGQ_L-QkYY0",
-        tags: ["muzik"]
-      }
+    B1:[
+      {label:"B1 Ders Dosyaları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1-4HicuJ5pDdyZim4mT_2ougN2v-vEwPD#grid",tags:["ders"]},
+      {label:"B1 Yararlı Videolar ve Materyaller (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1AnFbEW5pq2G6_7y2tA1-EReVj_LBibTm#grid",tags:["ek","video"]},
+      {label:"B1 Bilgilendirme Dokümanı (Google Docs)",url:"https://docs.google.com/document/d/1__fPtBM9tD_eNiaz88XTlO1VS-6P3ophA3x4FJyirXE/preview",tags:["genel","ders"]},
+      {label:"Almanca Dergi & Gazete (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1fvIHKArOr8QCOryBSK7-BdXNZmb04XNU#grid",tags:["okuma","dergi"]},
+      {label:"B1–B2 Okuma Metinleri (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1Db5TITLZrBDc01FptVUm0_VoLDdSVG3x#grid",tags:["okuma"]},
+      {label:"Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",url:"https://www.youtube.com/embed/GHf6eOr6MU0",tags:["dinleme","video"]},
+      {label:"Menschen Online Alıştırmalar · Kursbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=kursbuch",tags:["online"]},
+      {label:"Menschen Online Alıştırmalar · Arbeitsbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",tags:["online"]},
+      {label:"Kitap · B1/B2 (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1nwBOKfm6XL5TQZKNpQTonkJ21Qe5oF-w#grid",tags:["kitap","ders"]},
+      {label:"YouTube Almanca Müzikler Playlist",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGaC8tkVghThkGQ_L-QkYY0",tags:["muzik"]}
     ],
-
-    B2: [
-      {
-        label: "Kitap · B1/B2 (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1nwBOKfm6XL5TQZKNpQTonkJ21Qe5oF-w#grid",
-        tags: ["kitap", "ders"]
-      },
-      {
-        label: "B2 Alıştırma Klasörü (Drive)",
-        url: "https://drive.google.com/embeddedfolderview?id=1cQSd1Jjo8hvFhVHCJrwdzE8JMwMJnQZ9#grid",
-        tags: ["ek", "online"]
-      },
-      {
-        label: "B1–B2 Okuma Metinleri (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1Db5TITLZrBDc01FptVUm0_VoLDdSVG3x#grid",
-        tags: ["okuma"]
-      },
-      {
-        label: "Almanca Dergi & Gazete (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1fvIHKArOr8QCOryBSK7-BdXNZmb04XNU#grid",
-        tags: ["okuma", "dergi"]
-      },
-      {
-        label: "B1–B2 Yararlı Videolar ve Materyaller (Drive klasörü)",
-        url: "https://drive.google.com/embeddedfolderview?id=1AnFbEW5pq2G6_7y2tA1-EReVj_LBibTm#grid",
-        tags: ["ek", "video"]
-      },
-      {
-        label: "B2 YouTube Playlist (Kurs/Konu Tekrarları)",
-        url: "https://www.youtube.com/embed/videoseries?list=PLk1fjOl39-51lvdiuQYsLW-0aGIdNNknA",
-        tags: ["video", "konu"]
-      },
-      {
-        label: "Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",
-        url: "https://www.youtube.com/embed/GHf6eOr6MU0",
-        tags: ["dinleme", "video"]
-      },
-      {
-        label: "YouTube Almanca Müzikler Playlist",
-        url: "https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGaC8tkVghThkGQ_L-QkYY0",
-        tags: ["muzik"]
-      },
-      {
-        label: "Menschen Online Alıştırmalar · Kursbuch",
-        url: "https://www.hueber.de/menschen/lernen/uebungen?bestandteil=kursbuch",
-        tags: ["online"]
-      },
-      {
-        label: "Menschen Online Alıştırmalar · Arbeitsbuch",
-        url: "https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",
-        tags: ["online"]
-      }
+    B2:[
+      {label:"Kitap · B1/B2 (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1nwBOKfm6XL5TQZKNpQTonkJ21Qe5oF-w#grid",tags:["kitap","ders"]},
+      {label:"B2 Alıştırma Klasörü (Drive)",url:"https://drive.google.com/embeddedfolderview?id=1cQSd1Jjo8hvFhVHCJrwdzE8JMwMJnQZ9#grid",tags:["ek","online"]},
+      {label:"B1–B2 Okuma Metinleri (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1Db5TITLZrBDc01FptVUm0_VoLDdSVG3x#grid",tags:["okuma"]},
+      {label:"Almanca Dergi & Gazete (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1fvIHKArOr8QCOryBSK7-BdXNZmb04XNU#grid",tags:["okuma","dergi"]},
+      {label:"B1–B2 Yararlı Videolar ve Materyaller (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1AnFbEW5pq2G6_7y2tA1-EReVj_LBibTm#grid",tags:["ek","video"]},
+      {label:"B2 YouTube Playlist (Kurs/Konu Tekrarları)",url:"https://www.youtube.com/embed/videoseries?list=PLk1fjOl39-51lvdiuQYsLW-0aGIdNNknA",tags:["video","konu"]},
+      {label:"Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",url:"https://www.youtube.com/embed/GHf6eOr6MU0",tags:["dinleme","video"]},
+      {label:"YouTube Almanca Müzikler Playlist",url:"https://www.youtube.com/embed/videoseries?list=PLlPnminIi7ZGaC8tkVghThkGQ_L-QkYY0",tags:["muzik"]},
+      {label:"Menschen Online Alıştırmalar · Kursbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=kursbuch",tags:["online"]},
+      {label:"Menschen Online Alıştırmalar · Arbeitsbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",tags:["online"]}
     ],
-
-    // Sınav hazırlık kaynaklarını buraya ekleyebilirsin.
-    // Örn: SINAV: [{ label:"TELC B1–B2 Modelltest 1", url:"...", tags:["lesen","sinav"] }]
-    SINAV: []
+    SINAV:[]
   };
 
+  // Elemanlar
   const gateSection = document.getElementById("gateSection");
   const librarySection = document.getElementById("librarySection");
   const errorText = document.getElementById("errorText");
   const classCodeInput = document.getElementById("classCodeInput");
-
   const viewerTitle = document.getElementById("viewerTitle");
   const viewerMeta = document.getElementById("viewerMeta");
   const libraryFrame = document.getElementById("libraryFrame");
   const hintOverlay = document.getElementById("hintOverlay");
   const resourceChips = document.getElementById("resourceChips");
-  const filterSection = document.getElementById("filterSection");
-
   const searchInput = document.getElementById("searchInput");
   const recentRow = document.getElementById("recentRow");
   const recentChips = document.getElementById("recentChips");
+  const filterWrap = document.getElementById("filterSectionWrap");
+  const filterToggleBtn = document.getElementById("filterToggleBtn");
 
-  let currentLevel = "A1";
-  let viewMode = "kategori";
-  let activeTags = new Set();
-  let searchQuery = "";
-  let recentResources = [];
+  let currentLevel="A1";
+  let viewMode="kategori";
+  let activeTags=new Set();
+  let searchQuery="";
+  let recentResources=[];
 
-  function unlockLibrary() {
-    const value = (classCodeInput.value || "").trim();
-    if (!value) {
-      showError("Lütfen sınıf kodunu gir.");
-      return;
-    }
-    if (value.toLowerCase() !== CLASS_CODE.toLowerCase()) {
-      showError("Kod hatalı görünüyor. Lütfen sınıf öğretmeninden aldığın kodu tekrar kontrol et.");
-      return;
-    }
+  // ====== Giriş ======
+  function unlockLibrary(){
+    const value=(classCodeInput.value||"").trim();
+    if(!value){showError("Lütfen sınıf kodunu gir.");return;}
+    if(value.toLowerCase()!==CLASS_CODE.toLowerCase()){showError("Kod hatalı görünüyor. Lütfen sınıf öğretmeninden aldığın kodu tekrar kontrol et.");return;}
 
     errorText.classList.add("hidden");
     gateSection.classList.add("hidden");
-    librarySection.style.display = "block";
+    librarySection.style.display="block";
 
-    // Varsayılan A1 + kategori modu
-    currentLevel = "A1";
-    viewMode = "kategori";
-    activeTags = new Set();
-    searchQuery = "";
-    recentResources = [];
-    searchInput.value = "";
+    // Varsayılan
+    currentLevel="A1";viewMode="kategori";activeTags=new Set();searchQuery="";recentResources=[];searchInput.value="";
+    document.querySelectorAll(".level-btn").forEach(btn=>btn.classList.toggle("active",btn.getAttribute("data-level")===currentLevel));
+    document.querySelectorAll(".view-btn").forEach(btn=>btn.classList.toggle("active",btn.getAttribute("data-mode")===viewMode));
+    document.querySelectorAll(".filter-chip").forEach(btn=>btn.classList.remove("active"));
 
-    document.querySelectorAll(".level-btn").forEach(btn => {
-      btn.classList.toggle("active", btn.getAttribute("data-level") === currentLevel);
-    });
-    document.querySelectorAll(".view-btn").forEach(btn => {
-      btn.classList.toggle("active", btn.getAttribute("data-mode") === viewMode);
-    });
-    document.querySelectorAll(".filter-chip").forEach(btn => btn.classList.remove("active"));
-
-    filterSection.classList.remove("hidden");
+    // Mobilde filtre paneli kapalı başlasın
+    const startClosed = window.innerWidth <= 900;
+    setFilterOpen(!startClosed);
     renderRecent();
     refreshViewer();
 
-    classCodeInput.value = "";
+    classCodeInput.value="";
   }
 
-  function showError(message) {
-    errorText.textContent = message;
-    errorText.classList.remove("hidden");
-  }
+  function showError(message){errorText.textContent=message;errorText.classList.remove("hidden");}
 
-  function selectLevel(event) {
+  // ====== Filtre paneli aç/kapa ======
+  function setFilterOpen(isOpen){
+    filterWrap.classList.toggle("open",isOpen);
+    filterToggleBtn.setAttribute("aria-expanded",String(isOpen));
+    const count=activeTags.size;
+    filterToggleBtn.textContent = count>0
+      ? `🔍 Kategorileri düzenle (${count} seçili)`
+      : "🔍 Kategorileri düzenle";
+  }
+  function toggleFilterPanel(){setFilterOpen(!filterWrap.classList.contains("open"));}
+
+  // ====== Seçimler ======
+  function selectLevel(event){
     event.preventDefault();
-    const btn = event.currentTarget;
-    const level = btn.getAttribute("data-level");
-    currentLevel = level;
-
-    document.querySelectorAll(".level-btn").forEach(b => b.classList.remove("active"));
+    const btn=event.currentTarget;
+    currentLevel=btn.getAttribute("data-level");
+    document.querySelectorAll(".level-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-
     refreshViewer();
   }
 
-  function selectViewMode(event) {
+  function selectViewMode(event){
     event.preventDefault();
-    const btn = event.currentTarget;
-    const mode = btn.getAttribute("data-mode");
-    viewMode = mode;
-
-    document.querySelectorAll(".view-btn").forEach(b => b.classList.remove("active"));
+    const btn=event.currentTarget;
+    viewMode=btn.getAttribute("data-mode");
+    document.querySelectorAll(".view-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-
-    if (viewMode === "kategori") {
-      filterSection.classList.remove("hidden");
-    } else {
-      filterSection.classList.add("hidden");
-    }
-
+    // Liste modunda filtre paneli gizli kalsın
+    if(viewMode==="liste"){setFilterOpen(false);}
     refreshViewer();
   }
 
-  function toggleFilterTag(event) {
+  function toggleFilterTag(event){
     event.preventDefault();
-    const btn = event.currentTarget;
-    const tag = btn.getAttribute("data-tag");
-
-    if (activeTags.has(tag)) {
-      activeTags.delete(tag);
-      btn.classList.remove("active");
-    } else {
-      activeTags.add(tag);
-      btn.classList.add("active");
-    }
-
-    refreshViewer();
+    const btn=event.currentTarget;
+    const tag=btn.getAttribute("data-tag");
+    if(activeTags.has(tag)){activeTags.delete(tag);btn.classList.remove("active");}
+    else{activeTags.add(tag);btn.classList.add("active");}
+    setFilterOpen(true); // seçerken açık kalsın
   }
 
-  function getVisibleResources() {
-    const list = CONTENT[currentLevel] || [];
+  function applyFilters(){
+    refreshViewer();
+    // Uygula → panel kapansın (özellikle mobil)
+    setFilterOpen(false);
+  }
 
-    // Seviye için hiç kaynak yoksa direkt dön
-    if (!list.length) return [];
+  function clearFilters(){
+    activeTags.clear();
+    document.querySelectorAll(".filter-chip").forEach(btn=>btn.classList.remove("active"));
+    searchQuery=""; if(searchInput) searchInput.value="";
+    refreshViewer();
+    setFilterOpen(true);
+  }
 
-    let filtered = list;
+  // ====== Listeleme ======
+  function getVisibleResources(){
+    const list=CONTENT[currentLevel]||[];
+    if(!list.length) return [];
+    let filtered=list;
 
-    // Kategori filtresi aktifse uygula
-    if (viewMode === "kategori" && activeTags.size > 0) {
-      filtered = filtered.filter(item =>
-        (item.tags || []).some(t => activeTags.has(t))
-      );
+    if(viewMode==="kategori" && activeTags.size>0){
+      filtered=filtered.filter(item => (item.tags||[]).some(t=>activeTags.has(t)));
     }
-
-    // Arama kutusu doluysa oradan da filtrele
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(item =>
-        (item.label || "").toLowerCase().includes(q)
-      );
+    if(searchQuery){
+      const q=searchQuery.toLowerCase();
+      filtered=filtered.filter(item => (item.label||"").toLowerCase().includes(q));
     }
-
     return filtered;
   }
 
-  function refreshViewer() {
-    const resources = getVisibleResources();
-    const levelLabel = LEVEL_LABELS[currentLevel] || currentLevel;
-    const modeText = viewMode === "liste" ? "Tüm kaynak listesi" : "Kategori filtresi";
+  function refreshViewer(){
+    const resources=getVisibleResources();
+    const levelLabel=LEVEL_LABELS[currentLevel]||currentLevel;
+    const modeText=viewMode==="liste"?"Tüm kaynak listesi":"Kategori filtresi";
+    viewerTitle.textContent=levelLabel+" · "+modeText;
 
-    viewerTitle.textContent = levelLabel + " · " + modeText;
-
-    if ((CONTENT[currentLevel] || []).length === 0) {
-      viewerMeta.textContent = "Bu seviye için henüz kaynak eklenmedi.";
-    } else if (!resources.length && (activeTags.size > 0 || searchQuery)) {
-      viewerMeta.textContent = "Bu seviye, seçtiğin filtreler veya arama sonucuna göre kaynak bulunamadı.";
-    } else {
-      viewerMeta.textContent = resources.length +
-        " kaynak listelendi. Aşağıdaki butonlardan birine tıkladığında, içerik iframe’de açılır.";
+    if((CONTENT[currentLevel]||[]).length===0){
+      viewerMeta.textContent="Bu seviye için henüz kaynak eklenmedi.";
+    }else if(!resources.length && (activeTags.size>0||searchQuery)){
+      viewerMeta.textContent="Bu seviye, seçtiğin filtreler veya arama sonucuna göre kaynak bulunamadı.";
+    }else{
+      viewerMeta.textContent=resources.length+" kaynak listelendi. Aşağıdaki butonlardan birine tıkladığında, içerik iframe’de açılır.";
     }
 
-    if (!resources.length) {
-      resourceChips.innerHTML = "";
-      libraryFrame.src = "about:blank";
-      hintOverlay.classList.remove("hidden");
-      return;
+    if(!resources.length){
+      resourceChips.innerHTML="";libraryFrame.src="about:blank";hintOverlay.classList.remove("hidden");return;
     }
-
     renderResourceChips(resources);
-    libraryFrame.src = resources[0].url;
+    libraryFrame.src=resources[0].url;
     hintOverlay.classList.add("hidden");
   }
 
-  function renderResourceChips(resources) {
-    resourceChips.innerHTML = "";
-    resources.forEach((res, index) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "resource-chip" + (index === 0 ? " active" : "");
-      btn.textContent = res.label;
-      btn.addEventListener("click", function () {
-        document.querySelectorAll(".resource-chip").forEach(c => c.classList.remove("active"));
+  function renderResourceChips(resources){
+    resourceChips.innerHTML="";
+    resources.forEach((res,index)=>{
+      const btn=document.createElement("button");
+      btn.type="button";
+      btn.className="resource-chip"+(index===0?" active":"");
+      btn.textContent=res.label;
+      btn.addEventListener("click",function(){
+        document.querySelectorAll(".resource-chip").forEach(c=>c.classList.remove("active"));
         btn.classList.add("active");
-        libraryFrame.src = res.url;
+        libraryFrame.src=res.url;
         registerRecent(res);
       });
       resourceChips.appendChild(btn);
     });
   }
 
-  // Son açılanlar için basit kayıt sistemi
-  function registerRecent(resource) {
-    const key = currentLevel + " · " + (resource.label || "");
-    const existingIndex = recentResources.findIndex(r => r.key === key);
-
-    if (existingIndex !== -1) {
-      recentResources.splice(existingIndex, 1);
-    }
-
-    recentResources.unshift({
-      key,
-      level: currentLevel,
-      label: resource.label,
-      url: resource.url
-    });
-
-    // Maksimum 5 kayıt tut
-    if (recentResources.length > 5) {
-      recentResources.pop();
-    }
-
+  // ====== Son açılanlar ======
+  function registerRecent(resource){
+    const key=currentLevel+" · "+(resource.label||"");
+    const existingIndex=recentResources.findIndex(r=>r.key===key);
+    if(existingIndex!==-1){recentResources.splice(existingIndex,1);}
+    recentResources.unshift({key,level:currentLevel,label:resource.label,url:resource.url});
+    if(recentResources.length>5){recentResources.pop();}
     renderRecent();
   }
 
-  function renderRecent() {
-    if (!recentResources.length) {
-      recentRow.classList.add("hidden");
-      recentChips.innerHTML = "";
-      return;
-    }
-
-    recentRow.classList.remove("hidden");
-    recentChips.innerHTML = "";
-
-    recentResources.forEach(item => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "recent-chip";
-      btn.textContent = item.key;
-      btn.title = item.label;
-      btn.addEventListener("click", function () {
-        // İlgili seviyeye geç
-        currentLevel = item.level;
-        document.querySelectorAll(".level-btn").forEach(b => {
-          b.classList.toggle("active", b.getAttribute("data-level") === currentLevel);
-        });
-        // Filtre ve aramayı bozmadan sadece frame'i güncelle
-        libraryFrame.src = item.url;
-        hintOverlay.classList.add("hidden");
+  function renderRecent(){
+    if(!recentResources.length){recentRow.classList.add("hidden");recentChips.innerHTML="";return;}
+    recentRow.classList.remove("hidden");recentChips.innerHTML="";
+    recentResources.forEach(item=>{
+      const btn=document.createElement("button");
+      btn.type="button";btn.className="recent-chip";btn.textContent=item.key;btn.title=item.label;
+      btn.addEventListener("click",function(){
+        currentLevel=item.level;
+        document.querySelectorAll(".level-btn").forEach(b=>b.classList.toggle("active",b.getAttribute("data-level")===currentLevel));
+        libraryFrame.src=item.url;hintOverlay.classList.add("hidden");
       });
       recentChips.appendChild(btn);
     });
   }
 
-  // Arama alanı dinleyicisi
-  if (searchInput) {
-    searchInput.addEventListener("input", function () {
-      searchQuery = (this.value || "").toLowerCase().trim();
+  // Arama
+  if(searchInput){
+    searchInput.addEventListener("input",function(){
+      searchQuery=(this.value||"").toLowerCase().trim();
       refreshViewer();
-    });
+    },{passive:true});
   }
 
-  classCodeInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      unlockLibrary();
+  classCodeInput.addEventListener("keydown",function(e){
+    if(e.key==="Enter"){e.preventDefault();unlockLibrary();}
+  });
+
+  // ====== FAB: Mesaj At (WhatsApp & SMS) ======
+  const fabBtn=document.getElementById("fabBtn");
+  const fabMenu=document.getElementById("fabMenu");
+  const waText=encodeURIComponent("Aradığım kaynağı bulamadım");
+  const waNumber="905409122503"; // +90 540 912 25 03
+  const waHref=`https://wa.me/${waNumber}?text=${waText}`;
+  const smsHref=`sms:+${waNumber}?&body=${waText}`;
+  document.getElementById("waLink").setAttribute("href",waHref);
+  document.getElementById("smsLink").setAttribute("href",smsHref);
+
+  fabBtn.addEventListener("click",()=>{
+    const open=fabMenu.style.display==="block";
+    fabMenu.style.display=open?"none":"block";
+    // Varsayılan olarak WhatsApp'ı direkt açmak istersen yorum satırını kaldır:
+    // window.open(waHref,"_blank","noopener");
+  });
+
+  // Dışarı tıklayınca menüyü kapat
+  document.addEventListener("click",(e)=>{
+    if(!document.getElementById("helpFab").contains(e.target)){
+      fabMenu.style.display="none";
     }
   });
+
+  // İlk yüklemede filtre düğme metnini senkronla
+  setFilterOpen(false);
 </script>
 
 </body>

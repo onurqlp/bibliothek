@@ -110,6 +110,23 @@
     .hint-box strong{color:#f9fafb}
     .hint-box small{display:block;margin-top:4px;font-size:11px;color:#9ca3af}
 
+    /* iframe altındaki direkt link butonu */
+    .iframe-footer{margin-top:6px;font-size:11px;display:flex;justify-content:flex-end}
+    .iframe-direct-link{
+      font-size:11px;
+      padding:4px 10px;
+      border-radius:var(--radius-full);
+      border:1px dashed rgba(148,163,184,.6);
+      background:#f9fafb;
+      color:#0f172a;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+    }
+    .iframe-direct-link span:first-child{font-size:13px}
+
     .hidden{display:none !important}
     .error-text{margin-top:6px;font-size:11px;color:#b91c1c}
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -296,6 +313,14 @@
             </div>
           </div>
         </div>
+
+        <!-- iframe altındaki direkt link -->
+        <div class="iframe-footer">
+          <a id="openDirectLink" href="#" target="_blank" rel="noopener" class="iframe-direct-link" style="visibility:hidden">
+            <span>🔗</span>
+            <span>Açılmazsa bağlantıyı yeni sekmede aç</span>
+          </a>
+        </div>
       </section>
     </div>
   </section>
@@ -315,8 +340,8 @@
   const VALID_CODES = [
     "a1kasim25141125",
     "a1",
-    "a1kasim25141125",
-    "a2kasim25171125",
+    "a2",
+    "b1",
     "b2",
     "demo"
     // Yeni kod eklemek için: "a1subat2026" gibi satır ekle
@@ -405,6 +430,7 @@
   const recentChips = document.getElementById("recentChips");
   const filterWrap = document.getElementById("filterSectionWrap");
   const filterToggleBtn = document.getElementById("filterToggleBtn");
+  const openDirectLink = document.getElementById("openDirectLink");
 
   let currentLevel="A1";
   let viewMode="kategori";
@@ -430,8 +456,6 @@
     gateSection.classList.add("hidden");
     librarySection.style.display="block";
 
-    // İstersen burada koda göre başlangıç seviyesini değiştirebilirsin:
-    // if (value === "a2") currentLevel = "A2"; vb.
     currentLevel="A1";
     viewMode="kategori";
     activeTags=new Set();
@@ -458,6 +482,18 @@
   function showError(message){
     errorText.textContent=message;
     errorText.classList.remove("hidden");
+  }
+
+  // ==== iframe altındaki direkt linki güncelle ====
+  function updateDirectLink(url){
+    if(!openDirectLink) return;
+    if(url){
+      openDirectLink.href = url;
+      openDirectLink.style.visibility = "visible";
+    }else{
+      openDirectLink.href = "#";
+      openDirectLink.style.visibility = "hidden";
+    }
   }
 
   // ====== Filtre paneli aç/kapa ======
@@ -544,11 +580,17 @@
     }
 
     if(!resources.length){
-      resourceChips.innerHTML="";libraryFrame.src="about:blank";hintOverlay.classList.remove("hidden");return;
+      resourceChips.innerHTML="";
+      libraryFrame.src="about:blank";
+      hintOverlay.classList.remove("hidden");
+      updateDirectLink("");
+      return;
     }
+
     renderResourceChips(resources);
     libraryFrame.src=resources[0].url;
     hintOverlay.classList.add("hidden");
+    updateDirectLink(resources[0].url);
   }
 
   function renderResourceChips(resources){
@@ -563,6 +605,7 @@
         btn.classList.add("active");
         libraryFrame.src=res.url;
         registerRecent(res);
+        updateDirectLink(res.url);
       });
       resourceChips.appendChild(btn);
     });
@@ -587,7 +630,9 @@
       btn.addEventListener("click",function(){
         currentLevel=item.level;
         document.querySelectorAll(".level-btn").forEach(b=>b.classList.toggle("active",b.getAttribute("data-level")===currentLevel));
-        libraryFrame.src=item.url;hintOverlay.classList.add("hidden");
+        libraryFrame.src=item.url;
+        hintOverlay.classList.add("hidden");
+        updateDirectLink(item.url);
       });
       recentChips.appendChild(btn);
     });
@@ -626,6 +671,7 @@
     }
   });
 
+  // Başlangıçta filtre panelini kapalı başlat
   setFilterOpen(false);
 </script>
 

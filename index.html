@@ -230,7 +230,7 @@
         <!-- Collapsible filtre bölümü -->
         <div id="filterSectionWrap" class="collapsible">
           <div class="collapsible-inner">
-            <div id="filterSection" class="">
+            <div id="filterSection">
               <div class="btn-grid" style="margin-top:8px">
                 <button class="filter-chip" data-tag="ders" onclick="toggleFilterTag(event)"><span class="emoji">📚</span><span>Ders materyali</span></button>
                 <button class="filter-chip" data-tag="video" onclick="toggleFilterTag(event)"><span class="emoji">▶️</span><span>Ders videoları / tekrar</span></button>
@@ -245,6 +245,7 @@
                 <button class="filter-chip" data-tag="dergi" onclick="toggleFilterTag(event)"><span class="emoji">📰</span><span>Dergi &amp; gazete</span></button>
                 <button class="filter-chip" data-tag="kitap" onclick="toggleFilterTag(event)"><span class="emoji">📘</span><span>Kitap / PDF</span></button>
                 <button class="filter-chip" data-tag="genel" onclick="toggleFilterTag(event)"><span class="emoji">ℹ️</span><span>Genel bilgi</span></button>
+                <button class="filter-chip" data-tag="sinav" onclick="toggleFilterTag(event)"><span class="emoji">🎯</span><span>Sınav hazırlık</span></button>
               </div>
 
               <div class="filter-actions">
@@ -306,7 +307,7 @@
     <a id="waLink" href="#" target="_blank" rel="noopener" role="menuitem">WhatsApp ile ilet</a>
     <a id="smsLink" href="#" role="menuitem">SMS ile ilet</a>
   </div>
-  <button class="fab-btn" type="button" id="fabBtn">📩 Aradığım kaynağı bulamadım veya bir sorunla karşılaştım </button>
+  <button class="fab-btn" type="button" id="fabBtn">📩 Aradığım kaynağı bulamadım</button>
 </div>
 
 <script>
@@ -321,6 +322,7 @@
       {label:"A1 Ders Materyalleri (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1EhcIIju4RZyB5HfcccAF6q8nHIou2uwT#grid",tags:["ders"]},
       {label:"A1 Menschen Ders Videoları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1mv_Crm7n8s1javra-rW4a7fGz6PkFjQZ#grid",tags:["video"]},
       {label:"A1 Ek Materyal (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1vxr47d-wdfN6bBQfUJwKXvmv4luPiasq#grid",tags:["ek"]},
+      {label:"A1 Sınav Hazırlık (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1YolSViv4puykU6wfwTrQ2eswN9MhbCq8#grid",tags:["sinav","ek"]},
       {label:"Ders Kayıtlarını Nasıl İzlerim & Materyalleri Nereden İndirebilirim? (YouTube)",url:"https://www.youtube.com/embed/cw9jcwIXv6g",tags:["genel","video"]},
       {label:"Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",url:"https://www.youtube.com/embed/SgLBimupSIU",tags:["dinleme","video"]},
       {label:"A1 Cümle Kalıpları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1VAz1AtWp4RDmmRddSZwqQr5XtfszjkOS#grid",tags:["ek","konu"]},
@@ -338,6 +340,7 @@
     A2:[
       {label:"A2 Ders Materyalleri / Yararlı Materyaller (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1eRkHhSQ0cVnbMVOtvR-nDcOZRUFJOEKH#grid",tags:["ders","ek"]},
       {label:"A2 Menschen Ders Videoları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=10KGAPnOKlfd3trMtY4paFsJDCbGNok9k#grid",tags:["video"]},
+      {label:"A2 Sınav Hazırlık (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1zA2N_LlWTlHmUeEE1uay1pORqTvQBbSm#grid",tags:["sinav","ek"]},
       {label:"Arbeitsbuch Dinlemeleri Nasıl İndiririm? (YouTube)",url:"https://www.youtube.com/embed/GHf6eOr6MU0",tags:["dinleme","video"]},
       {label:"A2 Konuşma Kalıpları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1v1KnsUELnxaqwKEhN_8ruqGDOkHbrYFG#grid",tags:["konu","ek"]},
       {label:"A2 Konu Anlatım Videoları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1dkvJRQmwMAy4-xima2GhujCnFhRwq63B#grid",tags:["konu","video"]},
@@ -349,6 +352,7 @@
     B1:[
       {label:"B1 Ders Dosyaları (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1-4HicuJ5pDdyZim4mT_2ougN2v-vEwPD#grid",tags:["ders"]},
       {label:"B1 Yararlı Videolar ve Materyaller (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1AnFbEW5pq2G6_7y2tA1-EReVj_LBibTm#grid",tags:["ek","video"]},
+      {label:"B1 Sınav Hazırlık (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1fJ10MSgOCluvbN7GQVTn7hU-WHbRZoDB#grid",tags:["sinav","ek"]},
       {label:"B1 Bilgilendirme Dokümanı (Google Docs)",url:"https://docs.google.com/document/d/1__fPtBM9tD_eNiaz88XTlO1VS-6P3ophA3x4FJyirXE/preview",tags:["genel","ders"]},
       {label:"Almanca Dergi & Gazete (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1fvIHKArOr8QCOryBSK7-BdXNZmb04XNU#grid",tags:["okuma","dergi"]},
       {label:"B1–B2 Okuma Metinleri (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1Db5TITLZrBDc01FptVUm0_VoLDdSVG3x#grid",tags:["okuma"]},
@@ -360,7 +364,7 @@
     ],
     B2:[
       {label:"Kitap · B1/B2 (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1nwBOKfm6XL5TQZKNpQTonkJ21Qe5oF-w#grid",tags:["kitap","ders"]},
-      {label:"B2 Alıştırma Klasörü (Drive)",url:"https://drive.google.com/embeddedfolderview?id=1cQSd1Jjo8hvFhVHCJrwdzE8JMwMJnQZ9#grid",tags:["ek","online"]},
+      {label:"B2 Sınav Hazırlık (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1cQSd1Jjo8hvFhVHCJrwdzE8JMwMJnQZ9#grid",tags:["sinav","ek","online"]},
       {label:"B1–B2 Okuma Metinleri (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1Db5TITLZrBDc01FptVUm0_VoLDdSVG3x#grid",tags:["okuma"]},
       {label:"Almanca Dergi & Gazete (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1fvIHKArOr8QCOryBSK7-BdXNZmb04XNU#grid",tags:["okuma","dergi"]},
       {label:"B1–B2 Yararlı Videolar ve Materyaller (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1AnFbEW5pq2G6_7y2tA1-EReVj_LBibTm#grid",tags:["ek","video"]},
@@ -370,7 +374,12 @@
       {label:"Menschen Online Alıştırmalar · Kursbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=kursbuch",tags:["online"]},
       {label:"Menschen Online Alıştırmalar · Arbeitsbuch",url:"https://www.hueber.de/menschen/lernen/uebungen?bestandteil=arbeitsbuch",tags:["online"]}
     ],
-    SINAV:[]
+    SINAV:[
+      {label:"A1 Sınav Hazırlık (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1YolSViv4puykU6wfwTrQ2eswN9MhbCq8#grid",tags:["sinav","A1","ek"]},
+      {label:"A2 Sınav Hazırlık (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1zA2N_LlWTlHmUeEE1uay1pORqTvQBbSm#grid",tags:["sinav","A2","ek"]},
+      {label:"B1 Sınav Hazırlık (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1fJ10MSgOCluvbN7GQVTn7hU-WHbRZoDB#grid",tags:["sinav","B1","ek"]},
+      {label:"B2 Sınav Hazırlık (Drive klasörü)",url:"https://drive.google.com/embeddedfolderview?id=1cQSd1Jjo8hvFhVHCJrwdzE8JMwMJnQZ9#grid",tags:["sinav","B2","ek","online"]}
+    ]
   };
 
   // Elemanlar
@@ -405,13 +414,11 @@
     gateSection.classList.add("hidden");
     librarySection.style.display="block";
 
-    // Varsayılan
     currentLevel="A1";viewMode="kategori";activeTags=new Set();searchQuery="";recentResources=[];searchInput.value="";
     document.querySelectorAll(".level-btn").forEach(btn=>btn.classList.toggle("active",btn.getAttribute("data-level")===currentLevel));
     document.querySelectorAll(".view-btn").forEach(btn=>btn.classList.toggle("active",btn.getAttribute("data-mode")===viewMode));
     document.querySelectorAll(".filter-chip").forEach(btn=>btn.classList.remove("active"));
 
-    // Mobilde filtre paneli kapalı başlasın
     const startClosed = window.innerWidth <= 900;
     setFilterOpen(!startClosed);
     renderRecent();
@@ -449,7 +456,6 @@
     viewMode=btn.getAttribute("data-mode");
     document.querySelectorAll(".view-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
-    // Liste modunda filtre paneli gizli kalsın
     if(viewMode==="liste"){setFilterOpen(false);}
     refreshViewer();
   }
@@ -460,12 +466,11 @@
     const tag=btn.getAttribute("data-tag");
     if(activeTags.has(tag)){activeTags.delete(tag);btn.classList.remove("active");}
     else{activeTags.add(tag);btn.classList.add("active");}
-    setFilterOpen(true); // seçerken açık kalsın
+    setFilterOpen(true);
   }
 
   function applyFilters(){
     refreshViewer();
-    // Uygula → panel kapansın (özellikle mobil)
     setFilterOpen(false);
   }
 
@@ -582,18 +587,14 @@
   fabBtn.addEventListener("click",()=>{
     const open=fabMenu.style.display==="block";
     fabMenu.style.display=open?"none":"block";
-    // Varsayılan olarak WhatsApp'ı direkt açmak istersen yorum satırını kaldır:
-    // window.open(waHref,"_blank","noopener");
   });
 
-  // Dışarı tıklayınca menüyü kapat
   document.addEventListener("click",(e)=>{
     if(!document.getElementById("helpFab").contains(e.target)){
       fabMenu.style.display="none";
     }
   });
 
-  // İlk yüklemede filtre düğme metnini senkronla
   setFilterOpen(false);
 </script>
 

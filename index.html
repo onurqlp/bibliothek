@@ -311,8 +311,16 @@
 </div>
 
 <script>
-  // ==== ŞİFRE (Sınıf kodu) ====
-  const CLASS_CODE = "a1kasim25141125";
+  /* ==== ŞİFRE SİSTEMİ (Çoklu kod) ==== */
+  const VALID_CODES = [
+    "a1kasim25141125",
+    "a1",
+    "a2",
+    "b1",
+    "b2",
+    "demo"
+    // Yeni kod eklemek için: "a1subat2026" gibi satır ekle
+  ];
 
   const LEVEL_LABELS = {A1:"A1",A2:"A2",B1:"B1",B2:"B2",SINAV:"Sınav hazırlık"};
 
@@ -406,17 +414,37 @@
 
   // ====== Giriş ======
   function unlockLibrary(){
-    const value=(classCodeInput.value||"").trim();
-    if(!value){showError("Lütfen sınıf kodunu gir.");return;}
-    if(value.toLowerCase()!==CLASS_CODE.toLowerCase()){showError("Kod hatalı görünüyor. Lütfen sınıf öğretmeninden aldığın kodu tekrar kontrol et.");return;}
+    const value = (classCodeInput.value || "").trim().toLowerCase();
+
+    if(!value){
+      showError("Lütfen sınıf kodunu gir.");
+      return;
+    }
+
+    if(!VALID_CODES.includes(value)){
+      showError("Kod hatalı görünüyor. Lütfen sınıf öğretmeninden aldığın kodu tekrar kontrol et.");
+      return;
+    }
 
     errorText.classList.add("hidden");
     gateSection.classList.add("hidden");
     librarySection.style.display="block";
 
-    currentLevel="A1";viewMode="kategori";activeTags=new Set();searchQuery="";recentResources=[];searchInput.value="";
-    document.querySelectorAll(".level-btn").forEach(btn=>btn.classList.toggle("active",btn.getAttribute("data-level")===currentLevel));
-    document.querySelectorAll(".view-btn").forEach(btn=>btn.classList.toggle("active",btn.getAttribute("data-mode")===viewMode));
+    // İstersen burada koda göre başlangıç seviyesini değiştirebilirsin:
+    // if (value === "a2") currentLevel = "A2"; vb.
+    currentLevel="A1";
+    viewMode="kategori";
+    activeTags=new Set();
+    searchQuery="";
+    recentResources=[];
+    searchInput.value="";
+
+    document.querySelectorAll(".level-btn").forEach(btn =>
+      btn.classList.toggle("active",btn.getAttribute("data-level")===currentLevel)
+    );
+    document.querySelectorAll(".view-btn").forEach(btn =>
+      btn.classList.toggle("active",btn.getAttribute("data-mode")===viewMode)
+    );
     document.querySelectorAll(".filter-chip").forEach(btn=>btn.classList.remove("active"));
 
     const startClosed = window.innerWidth <= 900;
@@ -427,7 +455,10 @@
     classCodeInput.value="";
   }
 
-  function showError(message){errorText.textContent=message;errorText.classList.remove("hidden");}
+  function showError(message){
+    errorText.textContent=message;
+    errorText.classList.remove("hidden");
+  }
 
   // ====== Filtre paneli aç/kapa ======
   function setFilterOpen(isOpen){

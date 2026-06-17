@@ -685,11 +685,11 @@
         </div>
         <div class="top-actions">
           <div class="mini-pill">2027 Panel UI</div>
-          <div class="status-pill" id="passwordStatus"><span class="dot warn" id="statusDot"></span><span id="statusText">Şifre sistemi yükleniyor...</span></div>
+          <div class="status-pill" id="passwordStatus"><span class="dot ok" id="statusDot"></span><span id="statusText">Merkezi şifre sistemi hazır</span></div>
         </div>
       </header>
 
-      <section class="gate" id="gateSection">
+      <section class="gate" id="aydaLoginBox">
         <section class="hero">
           <div class="eyebrow">🔐 Merkezi sınıf kodu sistemi</div>
           <h2>AYDA kaynakları artık tek ekranda, uygulama düzeninde.</h2>
@@ -707,19 +707,19 @@
             <h3>Kütüphaneye giriş</h3>
             <p>Öğrencinin sınıf kodunu yazması yeterlidir. Kod doğruysa kaynak paneli otomatik açılır.</p>
 
-            <form class="login-form" onsubmit="event.preventDefault(); unlockLibrary();">
+            <form class="login-form" onsubmit="event.preventDefault(); if (typeof aydaCheckPassword === 'function') { aydaCheckPassword(); setTimeout(syncAydaAccessUI, 250); } else { showMessage('error','Merkezi şifre sistemi yüklenemedi. access-control.js bağlantısını kontrol edin.'); }">
               <div class="field">
-                <label for="classCodeInput">Sınıf kodu</label>
+                <label for="aydaPasswordInput">Sınıf kodu</label>
                 <div class="input-wrap">
                   <span>🔑</span>
-                  <input id="classCodeInput" type="password" placeholder="Örn: 240226" autocomplete="off" />
+                  <input id="aydaPasswordInput" type="password" placeholder="Örn: 240226" autocomplete="off" />
                   <button class="eye-btn" type="button" onclick="togglePassword()" aria-label="Şifreyi göster/gizle">👁️</button>
                 </div>
               </div>
-              <button id="loginBtn" class="primary-btn" type="submit" disabled>Giriş yap</button>
+              <button id="loginBtn" class="primary-btn" type="submit">Giriş yap</button>
             </form>
 
-            <div id="messageBox" class="message info show">Şifre listesi yükleniyor. İnternet bağlantısı veya GitHub Pages erişimi yoksa giriş geçici olarak yapılamaz.</div>
+            <div id="aydaLoginMessage" class="message info show" role="status" aria-live="polite">Sınıf kodunuzu girerek kütüphaneye giriş yapabilirsiniz.</div>
           </section>
 
           <section class="feature-card">
@@ -735,7 +735,7 @@
         </aside>
       </section>
 
-      <section class="library" id="librarySection">
+      <section class="library" id="aydaProtectedContent">
         <div class="workspace">
           <aside class="panel sidebar-sticky">
             <div class="class-card">
@@ -743,7 +743,7 @@
                 <strong id="activeCodeLabel">Kütüphane açık</strong>
                 <span>Merkezi şifre sistemi ile güvenli giriş yapıldı.</span>
               </div>
-              <button class="danger-btn" type="button" onclick="logout()">Çıkış</button>
+              <button class="danger-btn" type="button" onclick="aydaLogout()">Çıkış</button>
             </div>
 
             <p class="section-label">Seviye</p>
@@ -835,20 +835,14 @@
     <button class="fab-button" type="button" onclick="toggleFab()">📩 Aradığım kaynağı bulamadım</button>
   </div>
 
+  <script src="https://onurqlp.github.io/ayda-pass/access-control.js"></script>
+
   <script>
-    const PASSWORD_ENDPOINTS = [
-      "https://onurqlp.github.io/ayda-pass/passwords.json",
-      "https://onurqlp.github.io/ayda-pass/access-control.js"
-    ];
-
-    const EMERGENCY_LOCAL_CODES = [];
-
-    let VALID_CODES = new Set();
-    let passwordSourceLoaded = false;
     let currentLevel = "A1";
     let activeTags = new Set();
     let searchQuery = "";
     let currentResourceUrl = "";
+    let libraryInitialized = false;
 
     const LEVEL_LABELS = {
       A1:"A1",
@@ -928,10 +922,10 @@
       statusText:document.getElementById("statusText"),
       statusDot:document.getElementById("statusDot"),
       loginBtn:document.getElementById("loginBtn"),
-      messageBox:document.getElementById("messageBox"),
-      classCodeInput:document.getElementById("classCodeInput"),
-      gateSection:document.getElementById("gateSection"),
-      librarySection:document.getElementById("librarySection"),
+      messageBox:document.getElementById("aydaLoginMessage"),
+      classCodeInput:document.getElementById("aydaPasswordInput"),
+      gateSection:document.getElementById("aydaLoginBox"),
+      librarySection:document.getElementById("aydaProtectedContent"),
       activeCodeLabel:document.getElementById("activeCodeLabel"),
       viewerTitle:document.getElementById("viewerTitle"),
       viewerMeta:document.getElementById("viewerMeta"),
@@ -946,119 +940,51 @@
 
     function normalizeCode(code){ return String(code || "").trim().toLowerCase(); }
 
-    function collectCodesFromAny(input,bucket=[]){
-      if(!input) return bucket;
-      if(Array.isArray(input)){
-        input.forEach(item => collectCodesFromAny(item,bucket));
-        return bucket;
-      }
-      if(typeof input === "object"){
-        Object.values(input).forEach(value => collectCodesFromAny(value,bucket));
-        return bucket;
-      }
-      if(typeof input === "string" || typeof input === "number"){
-        const code = normalizeCode(input);
-        if(code && /^[a-z0-9ğüşıöç._-]{2,40}$/i.test(code)) bucket.push(code);
-      }
-      return bucket;
-    }
-
-    function parseJsCodes(text){
-      const found = [];
-      const quoted = text.match(/["'`]([^"'`]{2,40})["'`]/g) || [];
-      quoted.forEach(raw => {
-        const code = normalizeCode(raw.slice(1,-1));
-        if(/^[a-z0-9ğüşıöç._-]{2,40}$/i.test(code)) found.push(code);
-      });
-      return found;
-    }
-
-    async function fetchWithTimeout(url,ms=7000){
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(),ms);
-      try{
-        const res = await fetch(url + "?v=" + Date.now(),{cache:"no-store",signal:controller.signal});
-        if(!res.ok) throw new Error("HTTP " + res.status);
-        return await res.text();
-      }finally{
-        clearTimeout(timer);
-      }
-    }
-
-    async function loadPasswords(){
-      setStatus("warn","Şifre sistemi yükleniyor...");
-      els.loginBtn.disabled = true;
-      showMessage("info","Merkezi şifre listesi yükleniyor. GitHub Pages üzerinden güncel kodlar alınacak.");
-
-      const loaded = [];
-      const errors = [];
-
-      for(const url of PASSWORD_ENDPOINTS){
-        try{
-          const text = await fetchWithTimeout(url);
-          let codes = [];
-          if(url.endsWith(".json")){
-            codes = collectCodesFromAny(JSON.parse(text));
-          }else{
-            codes = parseJsCodes(text);
-          }
-          codes.forEach(code => loaded.push(code));
-        }catch(err){
-          errors.push(url + " → " + err.message);
-        }
-      }
-
-      EMERGENCY_LOCAL_CODES.forEach(code => loaded.push(normalizeCode(code)));
-      VALID_CODES = new Set(loaded.filter(Boolean));
-      passwordSourceLoaded = VALID_CODES.size > 0;
-
-      if(passwordSourceLoaded){
-        setStatus("ok",VALID_CODES.size + " aktif kod yüklendi");
-        els.loginBtn.disabled = false;
-        showMessage("info","Şifre sistemi hazır. Sınıf kodunu girerek kütüphaneye giriş yapabilirsin.");
-      }else{
-        setStatus("bad","Şifre listesi alınamadı");
-        els.loginBtn.disabled = true;
-        showMessage("error","Şifre dosyası okunamadı. ayda-pass deposunda passwords.json dosyasının public olduğundan emin ol. Denenen kaynaklar: " + errors.join(" | "));
-      }
-    }
-
     function setStatus(type,text){
       els.statusText.textContent = text;
       els.statusDot.className = "dot " + (type === "ok" ? "ok" : type === "bad" ? "bad" : "warn");
     }
 
     function showMessage(type,text){
+      if(!els.messageBox) return;
       els.messageBox.className = "message show " + type;
       els.messageBox.textContent = text;
     }
 
     function togglePassword(){
+      if(!els.classCodeInput) return;
       els.classCodeInput.type = els.classCodeInput.type === "password" ? "text" : "password";
     }
 
-    function unlockLibrary(){
-      const code = normalizeCode(els.classCodeInput.value);
-      if(!passwordSourceLoaded){
-        showMessage("error","Şifre listesi henüz yüklenmedi. Sayfayı yenileyip tekrar dene.");
-        return;
+    function getStoredAydaCode(){
+      return (
+        localStorage.getItem("ayda_code") ||
+        localStorage.getItem("aydaCode") ||
+        sessionStorage.getItem("ayda_code") ||
+        "aktif"
+      );
+    }
+
+    function syncAydaAccessUI(){
+      const protectedContent = document.getElementById("aydaProtectedContent");
+      if(!protectedContent) return;
+
+      const isVisible = window.getComputedStyle(protectedContent).display !== "none";
+
+      if(isVisible){
+        protectedContent.classList.add("open");
+        setStatus("ok","Kütüphane açık");
+        if(!libraryInitialized){
+          openLibrary(getStoredAydaCode());
+          libraryInitialized = true;
+        }
+      }else{
+        libraryInitialized = false;
+        setStatus("warn","Giriş bekleniyor");
       }
-      if(!code){
-        showMessage("error","Lütfen sınıf kodunu gir.");
-        return;
-      }
-      if(!VALID_CODES.has(code)){
-        showMessage("error","Kod hatalı görünüyor. Sınıf öğretmeninden aldığın kodu kontrol ederek tekrar dene.");
-        return;
-      }
-      sessionStorage.setItem("aydaLibraryUnlocked","1");
-      sessionStorage.setItem("aydaLibraryCode",code);
-      openLibrary(code);
     }
 
     function openLibrary(code){
-      els.gateSection.style.display = "none";
-      els.librarySection.classList.add("open");
       els.activeCodeLabel.textContent = "Kod: " + maskCode(code || "aktif");
       currentLevel = "A1";
       activeTags.clear();
@@ -1068,16 +994,37 @@
       renderResources();
     }
 
-    function logout(){
-      sessionStorage.removeItem("aydaLibraryUnlocked");
-      sessionStorage.removeItem("aydaLibraryCode");
-      els.librarySection.classList.remove("open");
-      els.gateSection.style.display = "grid";
-      els.classCodeInput.value = "";
-      els.libraryFrame.src = "about:blank";
+    function aydaLogout() {
+      if (typeof aydaClearAccess === "function") {
+        aydaClearAccess();
+      } else {
+        localStorage.removeItem("ayda_access");
+        localStorage.removeItem("ayda_code");
+        localStorage.removeItem("aydaCode");
+      }
+
+      if (els.librarySection) {
+        els.librarySection.classList.remove("open");
+        els.librarySection.style.display = "none";
+      }
+
+      if (els.gateSection) {
+        els.gateSection.style.display = "grid";
+      }
+
+      if (els.classCodeInput) {
+        els.classCodeInput.value = "";
+      }
+
+      if (els.libraryFrame) {
+        els.libraryFrame.src = "about:blank";
+      }
+
       currentResourceUrl = "";
+      libraryInitialized = false;
       setDirectLink("");
-      showMessage("info","Çıkış yapıldı. Tekrar giriş için sınıf kodunu yazabilirsin.");
+      setStatus("warn","Giriş bekleniyor");
+      showMessage("info","Çıkış yapıldı. Tekrar giriş için sınıf kodunu yazabilirsiniz.");
     }
 
     function maskCode(code){
@@ -1228,14 +1175,30 @@
       document.getElementById("smsLink").href = `sms:+${number}?&body=${text}`;
     }
 
-    document.addEventListener("DOMContentLoaded",async function(){
+    document.addEventListener("DOMContentLoaded",function(){
       setupContactLinks();
-      await loadPasswords();
-      const alreadyUnlocked = sessionStorage.getItem("aydaLibraryUnlocked") === "1";
-      const code = sessionStorage.getItem("aydaLibraryCode") || "aktif";
-      if(alreadyUnlocked && passwordSourceLoaded){
-        openLibrary(code);
+
+      const input = document.getElementById("aydaPasswordInput");
+      if(input){
+        input.addEventListener("keydown",function(event){
+          if(event.key === "Enter"){
+            event.preventDefault();
+            if(typeof aydaCheckPassword === "function"){
+              aydaCheckPassword();
+              setTimeout(syncAydaAccessUI,250);
+            }
+          }
+        });
       }
+
+      const protectedContent = document.getElementById("aydaProtectedContent");
+      if(protectedContent){
+        const observer = new MutationObserver(syncAydaAccessUI);
+        observer.observe(protectedContent,{attributes:true,attributeFilter:["style","class"]});
+      }
+
+      setTimeout(syncAydaAccessUI,100);
+      setTimeout(syncAydaAccessUI,600);
     });
   </script>
 </body>

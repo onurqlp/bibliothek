@@ -381,6 +381,12 @@
     .message.show{display:block}
     .message.info{color:var(--ayda);background:rgba(35,64,120,.07);border-color:rgba(35,64,120,.12)}
     .message.error{color:#991b1b;background:#fff1f2;border-color:rgba(220,38,38,.14)}
+    .message.success{color:#166534;background:#f0fdf4;border-color:rgba(22,163,74,.16)}
+
+    .primary-btn.loading{
+      pointer-events:none;
+      opacity:.78;
+    }
 
     .feature-card{
       padding:19px;
@@ -565,6 +571,7 @@
       background-position:0 0,0 11px,11px -11px,-11px 0;
     }
     iframe{width:100%;height:500px;border:0;background:#fff;display:block}
+    iframe.loading{opacity:.35;transition:opacity .18s ease}
 
     .empty{
       position:absolute;
@@ -707,7 +714,7 @@
             <h3>Kütüphaneye giriş</h3>
             <p>Öğrencinin sınıf kodunu yazması yeterlidir. Kod doğruysa kaynak paneli otomatik açılır.</p>
 
-            <form class="login-form" onsubmit="event.preventDefault(); if (typeof aydaCheckPassword === 'function') { aydaCheckPassword(); setTimeout(syncAydaAccessUI, 250); } else { showMessage('error','Merkezi şifre sistemi yüklenemedi. access-control.js bağlantısını kontrol edin.'); }">
+            <form class="login-form" onsubmit="handleAydaLogin(event)">
               <div class="field">
                 <label for="aydaPasswordInput">Sınıf kodu</label>
                 <div class="input-wrap">
@@ -973,10 +980,11 @@
 
       if(isVisible){
         protectedContent.classList.add("open");
+        if(els.gateSection) els.gateSection.style.display = "none";
         setStatus("ok","Kütüphane açık");
         if(!libraryInitialized){
-          openLibrary(getStoredAydaCode());
           libraryInitialized = true;
+          openLibrary(getStoredAydaCode());
         }
       }else{
         libraryInitialized = false;
@@ -992,6 +1000,53 @@
       els.searchInput.value = "";
       syncButtons();
       renderResources();
+    }
+
+    async function handleAydaLogin(event){
+      if(event) event.preventDefault();
+
+      if(typeof aydaCheckPassword !== "function"){
+        showMessage("error","Merkezi şifre sistemi yüklenemedi. access-control.js bağlantısını kontrol edin.");
+        setStatus("bad","Bağlantı hatası");
+        return;
+      }
+
+      const originalText = els.loginBtn ? els.loginBtn.textContent : "";
+
+      try{
+        if(els.loginBtn){
+          els.loginBtn.disabled = true;
+          els.loginBtn.classList.add("loading");
+          els.loginBtn.textContent = "Kontrol ediliyor...";
+        }
+
+        showMessage("info","Sınıf kodu kontrol ediliyor, lütfen bekleyin.");
+        setStatus("warn","Kontrol ediliyor");
+
+        await aydaCheckPassword();
+        syncAydaAccessUI();
+
+        const isOpen = els.librarySection && window.getComputedStyle(els.librarySection).display !== "none";
+        if(isOpen){
+          showMessage("success","Giriş başarılı. Kütüphane açıldı.");
+        }else{
+          const externalMessage = els.messageBox ? els.messageBox.textContent.trim() : "";
+          if(externalMessage && externalMessage !== "Sınıf kodu kontrol ediliyor, lütfen bekleyin."){
+            showMessage("error",externalMessage);
+          }
+          setStatus("warn","Giriş bekleniyor");
+        }
+      }catch(err){
+        console.error(err);
+        showMessage("error","Şifre sistemi şu an yanıt vermiyor. Bağlantıyı kontrol edip tekrar deneyin.");
+        setStatus("bad","Sistem yanıt vermedi");
+      }finally{
+        if(els.loginBtn){
+          els.loginBtn.disabled = false;
+          els.loginBtn.classList.remove("loading");
+          els.loginBtn.textContent = originalText || "Giriş yap";
+        }
+      }
     }
 
     function aydaLogout() {
@@ -1107,14 +1162,21 @@
       resources.forEach((res,index) => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "resource-card-btn" + (index === 0 ? " active" : "");
+        btn.className = "resource-card-btn";
         const tags = (res.tags || []).slice(0,3).map(tag => `<span class="tag-mini">${tag}</span>`).join("");
         btn.innerHTML = `<span class="resource-title">${currentLevel === "TUMU" ? `<small>${res.level}</small><br>` : ""}${escapeHtml(res.label)}</span><span class="resource-tags">${tags}</span>`;
         btn.onclick = () => openResource(res,btn);
         els.resourceList.appendChild(btn);
       });
 
-      openResource(resources[0],els.resourceList.querySelector(".resource-card-btn"));
+      currentResourceUrl = "";
+      setDirectLink("");
+      els.libraryFrame.removeAttribute("src");
+      els.emptyState.classList.add("show");
+      const emptyTitle = els.emptyState.querySelector("b");
+      const emptyText = els.emptyState.querySelector("p");
+      if(emptyTitle) emptyTitle.textContent = "Kaynak seçin";
+      if(emptyText) emptyText.textContent = "Listeden bir kaynak kartına tıkladığınızda burada açılır. Bazı siteler iframe içinde açılmazsa yeni sekme butonunu kullanabilirsiniz.";
     }
 
     function escapeHtml(text){
@@ -1125,6 +1187,8 @@
       document.querySelectorAll(".resource-card-btn").forEach(btn => btn.classList.remove("active"));
       if(button) button.classList.add("active");
       currentResourceUrl = resource.url;
+      els.emptyState.classList.remove("show");
+      els.libraryFrame.classList.add("loading");
       els.libraryFrame.src = resource.url;
       setDirectLink(resource.url);
     }
@@ -1183,10 +1247,7 @@
         input.addEventListener("keydown",function(event){
           if(event.key === "Enter"){
             event.preventDefault();
-            if(typeof aydaCheckPassword === "function"){
-              aydaCheckPassword();
-              setTimeout(syncAydaAccessUI,250);
-            }
+            handleAydaLogin(event);
           }
         });
       }
@@ -1199,6 +1260,12 @@
 
       setTimeout(syncAydaAccessUI,100);
       setTimeout(syncAydaAccessUI,600);
+
+      if(els.libraryFrame){
+        els.libraryFrame.addEventListener("load",function(){
+          els.libraryFrame.classList.remove("loading");
+        });
+      }
     });
   </script>
 </body>

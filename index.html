@@ -842,7 +842,7 @@
     <button class="fab-button" type="button" onclick="toggleFab()">📩 Aradığım kaynağı bulamadım</button>
   </div>
 
-  <script src="https://onurqlp.github.io/ayda-pass/access-control.js"></script>
+  <script src="https://onurqlp.github.io/ayda-pass/access-control.js" onload="window.aydaAccessControlLoaded=true" onerror="window.aydaAccessControlLoaded=false"></script>
 
   <script>
     let currentLevel = "A1";
@@ -944,8 +944,12 @@
       directLinkBottom:document.getElementById("directLinkBottom"),
       fabMenu:document.getElementById("fabMenu")
     };
-
     function normalizeCode(code){ return String(code || "").trim().toLowerCase(); }
+
+    function isAydaAccessOpen(){
+      const access = localStorage.getItem("ayda_access");
+      return access === "true" || access === "1" || access === "granted";
+    }
 
     function setStatus(type,text){
       els.statusText.textContent = text;
@@ -970,6 +974,18 @@
         sessionStorage.getItem("ayda_code") ||
         "aktif"
       );
+    }
+    function restoreAydaAccess(){
+      if(!isAydaAccessOpen()) return;
+
+      const code = getStoredAydaCode();
+      if(els.gateSection) els.gateSection.style.display = "none";
+      if(els.librarySection) els.librarySection.style.display = "block";
+      syncAydaAccessUI();
+      if(!libraryInitialized){
+        libraryInitialized = true;
+        openLibrary(code);
+      }
     }
 
     function syncAydaAccessUI(){
@@ -1001,58 +1017,107 @@
       syncButtons();
       renderResources();
     }
+    function loadAydaAccessControlAgain(){
+      return new Promise(function(resolve,reject){
+        if(typeof window.aydaCheckPassword === "function"){
+          resolve();
+          return;
+        }
+
+        const existing = document.querySelector('script[data-ayda-access-retry="1"]');
+        if(existing){
+          existing.addEventListener("load",function(){
+            if(typeof window.aydaCheckPassword === "function") resolve();
+            else reject(new Error("Merkezi giriş fonksiyonu bulunamadı."));
+          },{once:true});
+          existing.addEventListener("error",function(){
+            reject(new Error("Merkezi giriş dosyası yüklenemedi."));
+          },{once:true});
+          return;
+        }
+
+        const script = document.createElement("script");
+        script.src = "https://onurqlp.github.io/ayda-pass/access-control.js?v=" + Date.now();
+        script.dataset.aydaAccessRetry = "1";
+        script.onload = function(){
+          window.aydaAccessControlLoaded = true;
+          if(typeof window.aydaCheckPassword === "function") resolve();
+          else reject(new Error("Merkezi giriş fonksiyonu bulunamadı."));
+        };
+        script.onerror = function(){
+          window.aydaAccessControlLoaded = false;
+          reject(new Error("Merkezi giriş dosyası yüklenemedi."));
+        };
+        document.body.appendChild(script);
+      });
+    }
 
     async function handleAydaLogin(event){
       if(event) event.preventDefault();
 
-      if(typeof aydaCheckPassword !== "function"){
-        showMessage("error","Merkezi şifre sistemi yüklenemedi. access-control.js bağlantısını kontrol edin.");
-        setStatus("bad","Bağlantı hatası");
+      const originalText = els.loginBtn ? els.loginBtn.textContent : "Giriş yap";
+      const inputCode = els.classCodeInput ? els.classCodeInput.value.trim() : "";
+
+      if(!inputCode){
+        showMessage("error","Lütfen sınıf kodunuzu giriniz.");
+        setStatus("warn","Giriş bekleniyor");
         return;
       }
 
-      const originalText = els.loginBtn ? els.loginBtn.textContent : "";
+      if(els.loginBtn){
+        els.loginBtn.disabled = true;
+        els.loginBtn.classList.add("loading");
+        els.loginBtn.textContent = "Kontrol ediliyor...";
+      }
+
+      showMessage("info","Sınıf kodu merkezi sistemden kontrol ediliyor.");
+      setStatus("warn","Kontrol ediliyor");
 
       try{
-        if(els.loginBtn){
-          els.loginBtn.disabled = true;
-          els.loginBtn.classList.add("loading");
-          els.loginBtn.textContent = "Kontrol ediliyor...";
-        }
-
-        showMessage("info","Sınıf kodu kontrol ediliyor, lütfen bekleyin.");
-        setStatus("warn","Kontrol ediliyor");
-
-        await aydaCheckPassword();
-        syncAydaAccessUI();
-
-        const isOpen = els.librarySection && window.getComputedStyle(els.librarySection).display !== "none";
-        if(isOpen){
-          showMessage("success","Giriş başarılı. Kütüphane açıldı.");
-        }else{
-          const externalMessage = els.messageBox ? els.messageBox.textContent.trim() : "";
-          if(externalMessage && externalMessage !== "Sınıf kodu kontrol ediliyor, lütfen bekleyin."){
-            showMessage("error",externalMessage);
-          }
-          setStatus("warn","Giriş bekleniyor");
-        }
+        await loadAydaAccessControlAgain();
+        window.aydaCheckPassword();
       }catch(err){
         console.error(err);
-        showMessage("error","Şifre sistemi şu an yanıt vermiyor. Bağlantıyı kontrol edip tekrar deneyin.");
-        setStatus("bad","Sistem yanıt vermedi");
-      }finally{
+        showMessage("error","Merkezi şifre dosyasına ulaşılamadı. access-control.js bağlantısını ve internet erişimini kontrol ediniz.");
+        setStatus("bad","Bağlantı hatası");
         if(els.loginBtn){
           els.loginBtn.disabled = false;
           els.loginBtn.classList.remove("loading");
           els.loginBtn.textContent = originalText || "Giriş yap";
         }
+        return;
       }
+
+      setTimeout(function(){
+        syncAydaAccessUI();
+
+        const isOpen = els.librarySection && window.getComputedStyle(els.librarySection).display !== "none";
+        if(isOpen || isAydaAccessOpen()){
+          if(els.gateSection) els.gateSection.style.display = "none";
+          if(els.librarySection) els.librarySection.style.display = "block";
+          syncAydaAccessUI();
+          showMessage("success","Giriş başarılı. Kütüphane açıldı.");
+          setStatus("ok","Kütüphane açık");
+        }else{
+          const currentMessage = els.messageBox ? els.messageBox.textContent.trim() : "";
+          if(!currentMessage || currentMessage === "Sınıf kodu merkezi sistemden kontrol ediliyor."){
+            showMessage("error","Kod hatalı veya süresi dolmuş olabilir. Lütfen sınıf kodunuzu kontrol ediniz.");
+          }
+          setStatus("warn","Giriş bekleniyor");
+        }
+
+        if(els.loginBtn){
+          els.loginBtn.disabled = false;
+          els.loginBtn.classList.remove("loading");
+          els.loginBtn.textContent = originalText || "Giriş yap";
+        }
+      },700);
     }
 
-    function aydaLogout() {
-      if (typeof aydaClearAccess === "function") {
+    function aydaLogout(silent) {
+      if(typeof aydaClearAccess === "function"){
         aydaClearAccess();
-      } else {
+      }else{
         localStorage.removeItem("ayda_access");
         localStorage.removeItem("ayda_code");
         localStorage.removeItem("aydaCode");
@@ -1079,7 +1144,9 @@
       libraryInitialized = false;
       setDirectLink("");
       setStatus("warn","Giriş bekleniyor");
-      showMessage("info","Çıkış yapıldı. Tekrar giriş için sınıf kodunu yazabilirsiniz.");
+      if(!silent){
+        showMessage("info","Çıkış yapıldı. Tekrar giriş için sınıf kodunu yazabilirsiniz.");
+      }
     }
 
     function maskCode(code){
@@ -1242,6 +1309,14 @@
     document.addEventListener("DOMContentLoaded",function(){
       setupContactLinks();
 
+      setTimeout(function(){
+        if(typeof window.aydaCheckPassword === "function"){
+          setStatus("ok","Merkezi şifre sistemi hazır");
+        }else{
+          setStatus("warn","Merkezi sistem bekleniyor");
+        }
+      },300);
+
       const input = document.getElementById("aydaPasswordInput");
       if(input){
         input.addEventListener("keydown",function(event){
@@ -1260,6 +1335,7 @@
 
       setTimeout(syncAydaAccessUI,100);
       setTimeout(syncAydaAccessUI,600);
+      restoreAydaAccess();
 
       if(els.libraryFrame){
         els.libraryFrame.addEventListener("load",function(){

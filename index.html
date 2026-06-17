@@ -412,6 +412,8 @@
     .feature-item b{display:block;margin-top:8px;font-size:13px}
     .feature-item span{display:block;margin-top:4px;color:#dbeafe;font-size:11px;line-height:1.35}
 
+    #aydaProtectedContent{display:none}
+
     .library{
       display:none;
       padding:18px;
@@ -842,7 +844,7 @@
     <button class="fab-button" type="button" onclick="toggleFab()">📩 Aradığım kaynağı bulamadım</button>
   </div>
 
-  <script src="https://onurqlp.github.io/ayda-pass/access-control.js" onload="window.aydaAccessControlLoaded=true" onerror="window.aydaAccessControlLoaded=false"></script>
+  <script src="https://onurqlp.github.io/ayda-pass/access-control.js"></script>
 
   <script>
     let currentLevel = "A1";
@@ -944,14 +946,9 @@
       directLinkBottom:document.getElementById("directLinkBottom"),
       fabMenu:document.getElementById("fabMenu")
     };
-    function normalizeCode(code){ return String(code || "").trim().toLowerCase(); }
-
-    function isAydaAccessOpen(){
-      const access = localStorage.getItem("ayda_access");
-      return access === "true" || access === "1" || access === "granted";
-    }
 
     function setStatus(type,text){
+      if(!els.statusText || !els.statusDot) return;
       els.statusText.textContent = text;
       els.statusDot.className = "dot " + (type === "ok" ? "ok" : type === "bad" ? "bad" : "warn");
     }
@@ -972,87 +969,59 @@
         localStorage.getItem("ayda_code") ||
         localStorage.getItem("aydaCode") ||
         sessionStorage.getItem("ayda_code") ||
+        sessionStorage.getItem("aydaCode") ||
         "aktif"
       );
     }
-    function restoreAydaAccess(){
-      if(!isAydaAccessOpen()) return;
 
-      const code = getStoredAydaCode();
-      if(els.gateSection) els.gateSection.style.display = "none";
-      if(els.librarySection) els.librarySection.style.display = "block";
-      syncAydaAccessUI();
-      if(!libraryInitialized){
-        libraryInitialized = true;
-        openLibrary(code);
-      }
+    function hasStoredAydaAccess(){
+      const values = [
+        localStorage.getItem("ayda_access"),
+        localStorage.getItem("aydaAccess"),
+        sessionStorage.getItem("ayda_access"),
+        sessionStorage.getItem("aydaAccess")
+      ].map(value => String(value || "").toLowerCase());
+
+      return values.some(value => value === "true" || value === "1" || value === "granted" || value === "ok");
     }
 
-    function syncAydaAccessUI(){
-      const protectedContent = document.getElementById("aydaProtectedContent");
-      if(!protectedContent) return;
+    function isProtectedVisible(){
+      if(!els.librarySection) return false;
+      return window.getComputedStyle(els.librarySection).display !== "none";
+    }
 
-      const isVisible = window.getComputedStyle(protectedContent).display !== "none";
+    function activateLibraryIfOpen(){
+      if(!els.librarySection || !els.gateSection) return false;
 
-      if(isVisible){
-        protectedContent.classList.add("open");
-        if(els.gateSection) els.gateSection.style.display = "none";
-        setStatus("ok","Kütüphane açık");
-        if(!libraryInitialized){
-          libraryInitialized = true;
-          openLibrary(getStoredAydaCode());
-        }
-      }else{
-        libraryInitialized = false;
-        setStatus("warn","Giriş bekleniyor");
+      const openByExternalScript = isProtectedVisible();
+      const openByStorage = hasStoredAydaAccess();
+
+      if(!openByExternalScript && !openByStorage) return false;
+
+      els.gateSection.style.display = "none";
+      els.librarySection.style.display = "block";
+      els.librarySection.classList.add("open");
+      setStatus("ok","Kütüphane açık");
+
+      if(!libraryInitialized){
+        libraryInitialized = true;
+        openLibrary(getStoredAydaCode());
       }
+
+      return true;
     }
 
     function openLibrary(code){
-      els.activeCodeLabel.textContent = "Kod: " + maskCode(code || "aktif");
+      if(els.activeCodeLabel) els.activeCodeLabel.textContent = "Kod: " + maskCode(code || "aktif");
       currentLevel = "A1";
       activeTags.clear();
       searchQuery = "";
-      els.searchInput.value = "";
+      if(els.searchInput) els.searchInput.value = "";
       syncButtons();
       renderResources();
     }
-    function loadAydaAccessControlAgain(){
-      return new Promise(function(resolve,reject){
-        if(typeof window.aydaCheckPassword === "function"){
-          resolve();
-          return;
-        }
 
-        const existing = document.querySelector('script[data-ayda-access-retry="1"]');
-        if(existing){
-          existing.addEventListener("load",function(){
-            if(typeof window.aydaCheckPassword === "function") resolve();
-            else reject(new Error("Merkezi giriş fonksiyonu bulunamadı."));
-          },{once:true});
-          existing.addEventListener("error",function(){
-            reject(new Error("Merkezi giriş dosyası yüklenemedi."));
-          },{once:true});
-          return;
-        }
-
-        const script = document.createElement("script");
-        script.src = "https://onurqlp.github.io/ayda-pass/access-control.js?v=" + Date.now();
-        script.dataset.aydaAccessRetry = "1";
-        script.onload = function(){
-          window.aydaAccessControlLoaded = true;
-          if(typeof window.aydaCheckPassword === "function") resolve();
-          else reject(new Error("Merkezi giriş fonksiyonu bulunamadı."));
-        };
-        script.onerror = function(){
-          window.aydaAccessControlLoaded = false;
-          reject(new Error("Merkezi giriş dosyası yüklenemedi."));
-        };
-        document.body.appendChild(script);
-      });
-    }
-
-    async function handleAydaLogin(event){
+    function handleAydaLogin(event){
       if(event) event.preventDefault();
 
       const originalText = els.loginBtn ? els.loginBtn.textContent : "Giriş yap";
@@ -1061,7 +1030,13 @@
       if(!inputCode){
         showMessage("error","Lütfen sınıf kodunuzu giriniz.");
         setStatus("warn","Giriş bekleniyor");
-        return;
+        return false;
+      }
+
+      if(typeof window.aydaCheckPassword !== "function"){
+        showMessage("error","Şifre sistemi henüz yüklenmedi. Sayfayı yenileyip tekrar deneyiniz.");
+        setStatus("bad","Şifre sistemi yüklenemedi");
+        return false;
       }
 
       if(els.loginBtn){
@@ -1070,37 +1045,37 @@
         els.loginBtn.textContent = "Kontrol ediliyor...";
       }
 
-      showMessage("info","Sınıf kodu merkezi sistemden kontrol ediliyor.");
+      showMessage("info","Sınıf kodu kontrol ediliyor.");
       setStatus("warn","Kontrol ediliyor");
 
       try{
-        await loadAydaAccessControlAgain();
         window.aydaCheckPassword();
       }catch(err){
-        console.error(err);
-        showMessage("error","Merkezi şifre dosyasına ulaşılamadı. access-control.js bağlantısını ve internet erişimini kontrol ediniz.");
-        setStatus("bad","Bağlantı hatası");
+        console.error("aydaCheckPassword hatası:",err);
+        showMessage("error","Giriş kontrolünde hata oluştu. Sayfayı yenileyip tekrar deneyiniz.");
+        setStatus("bad","Giriş hatası");
         if(els.loginBtn){
           els.loginBtn.disabled = false;
           els.loginBtn.classList.remove("loading");
           els.loginBtn.textContent = originalText || "Giriş yap";
         }
-        return;
+        return false;
       }
 
-      setTimeout(function(){
-        syncAydaAccessUI();
+      const checks = [120,350,800,1400];
+      checks.forEach(function(delay){
+        setTimeout(function(){
+          const opened = activateLibraryIfOpen();
+          if(opened){
+            showMessage("success","Giriş başarılı. Kütüphane açıldı.");
+          }
+        },delay);
+      });
 
-        const isOpen = els.librarySection && window.getComputedStyle(els.librarySection).display !== "none";
-        if(isOpen || isAydaAccessOpen()){
-          if(els.gateSection) els.gateSection.style.display = "none";
-          if(els.librarySection) els.librarySection.style.display = "block";
-          syncAydaAccessUI();
-          showMessage("success","Giriş başarılı. Kütüphane açıldı.");
-          setStatus("ok","Kütüphane açık");
-        }else{
+      setTimeout(function(){
+        if(!activateLibraryIfOpen()){
           const currentMessage = els.messageBox ? els.messageBox.textContent.trim() : "";
-          if(!currentMessage || currentMessage === "Sınıf kodu merkezi sistemden kontrol ediliyor."){
+          if(!currentMessage || currentMessage === "Sınıf kodu kontrol ediliyor."){
             showMessage("error","Kod hatalı veya süresi dolmuş olabilir. Lütfen sınıf kodunuzu kontrol ediniz.");
           }
           setStatus("warn","Giriş bekleniyor");
@@ -1111,41 +1086,37 @@
           els.loginBtn.classList.remove("loading");
           els.loginBtn.textContent = originalText || "Giriş yap";
         }
-      },700);
+      },1600);
+
+      return false;
     }
 
-    function aydaLogout(silent) {
-      if(typeof aydaClearAccess === "function"){
-        aydaClearAccess();
-      }else{
-        localStorage.removeItem("ayda_access");
-        localStorage.removeItem("ayda_code");
-        localStorage.removeItem("aydaCode");
+    function aydaLogout(silent){
+      if(typeof window.aydaClearAccess === "function"){
+        try{ window.aydaClearAccess(); }catch(err){ console.warn("aydaClearAccess hatası:",err); }
       }
 
-      if (els.librarySection) {
+      ["ayda_access","aydaAccess","ayda_code","aydaCode"].forEach(function(key){
+        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
+      });
+
+      if(els.librarySection){
         els.librarySection.classList.remove("open");
         els.librarySection.style.display = "none";
       }
 
-      if (els.gateSection) {
-        els.gateSection.style.display = "grid";
-      }
-
-      if (els.classCodeInput) {
-        els.classCodeInput.value = "";
-      }
-
-      if (els.libraryFrame) {
-        els.libraryFrame.src = "about:blank";
-      }
+      if(els.gateSection) els.gateSection.style.display = "grid";
+      if(els.classCodeInput) els.classCodeInput.value = "";
+      if(els.libraryFrame) els.libraryFrame.src = "about:blank";
 
       currentResourceUrl = "";
       libraryInitialized = false;
       setDirectLink("");
       setStatus("warn","Giriş bekleniyor");
+
       if(!silent){
-        showMessage("info","Çıkış yapıldı. Tekrar giriş için sınıf kodunu yazabilirsiniz.");
+        showMessage("info","Çıkış yapıldı. Tekrar giriş için sınıf kodunuzu yazabilirsiniz.");
       }
     }
 
@@ -1171,14 +1142,14 @@
     function clearFilters(){
       activeTags.clear();
       searchQuery = "";
-      els.searchInput.value = "";
+      if(els.searchInput) els.searchInput.value = "";
       syncButtons();
       renderResources();
     }
 
     function clearSearch(){
       searchQuery = "";
-      els.searchInput.value = "";
+      if(els.searchInput) els.searchInput.value = "";
       renderResources();
     }
 
@@ -1210,40 +1181,47 @@
     function renderResources(){
       const resources = getResources();
       const activeFilterText = activeTags.size ? " · " + Array.from(activeTags).join(", ") : "";
-      els.viewerTitle.textContent = (LEVEL_LABELS[currentLevel] || currentLevel) + " · Online Kütüphane";
-      els.viewerMeta.textContent = resources.length
-        ? resources.length + " kaynak listeleniyor" + activeFilterText + ". Kaynak kartına tıklayınca aşağıda açılır."
-        : "Bu seçimde kaynak bulunamadı.";
 
+      if(els.viewerTitle) els.viewerTitle.textContent = (LEVEL_LABELS[currentLevel] || currentLevel) + " · Online Kütüphane";
+      if(els.viewerMeta){
+        els.viewerMeta.textContent = resources.length
+          ? resources.length + " kaynak listeleniyor" + activeFilterText + ". Kaynak kartına tıklayınca aşağıda açılır."
+          : "Bu seçimde kaynak bulunamadı.";
+      }
+
+      if(!els.resourceList) return;
       els.resourceList.innerHTML = "";
 
       if(!resources.length){
-        els.libraryFrame.src = "about:blank";
+        if(els.libraryFrame) els.libraryFrame.src = "about:blank";
         currentResourceUrl = "";
-        els.emptyState.classList.add("show");
+        if(els.emptyState) els.emptyState.classList.add("show");
         setDirectLink("");
         return;
       }
 
-      els.emptyState.classList.remove("show");
+      if(els.emptyState) els.emptyState.classList.remove("show");
+
       resources.forEach((res,index) => {
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "resource-card-btn";
-        const tags = (res.tags || []).slice(0,3).map(tag => `<span class="tag-mini">${tag}</span>`).join("");
-        btn.innerHTML = `<span class="resource-title">${currentLevel === "TUMU" ? `<small>${res.level}</small><br>` : ""}${escapeHtml(res.label)}</span><span class="resource-tags">${tags}</span>`;
+        const tags = (res.tags || []).slice(0,3).map(tag => `<span class="tag-mini">${escapeHtml(tag)}</span>`).join("");
+        btn.innerHTML = `<span class="resource-title">${currentLevel === "TUMU" ? `<small>${escapeHtml(res.level)}</small><br>` : ""}${escapeHtml(res.label)}</span><span class="resource-tags">${tags}</span>`;
         btn.onclick = () => openResource(res,btn);
         els.resourceList.appendChild(btn);
       });
 
       currentResourceUrl = "";
       setDirectLink("");
-      els.libraryFrame.removeAttribute("src");
-      els.emptyState.classList.add("show");
-      const emptyTitle = els.emptyState.querySelector("b");
-      const emptyText = els.emptyState.querySelector("p");
-      if(emptyTitle) emptyTitle.textContent = "Kaynak seçin";
-      if(emptyText) emptyText.textContent = "Listeden bir kaynak kartına tıkladığınızda burada açılır. Bazı siteler iframe içinde açılmazsa yeni sekme butonunu kullanabilirsiniz.";
+      if(els.libraryFrame) els.libraryFrame.removeAttribute("src");
+      if(els.emptyState){
+        els.emptyState.classList.add("show");
+        const emptyTitle = els.emptyState.querySelector("b");
+        const emptyText = els.emptyState.querySelector("p");
+        if(emptyTitle) emptyTitle.textContent = "Kaynak seçin";
+        if(emptyText) emptyText.textContent = "Listeden bir kaynak kartına tıkladığınızda burada açılır. Bazı siteler iframe içinde açılmazsa yeni sekme butonunu kullanabilirsiniz.";
+      }
     }
 
     function escapeHtml(text){
@@ -1254,14 +1232,17 @@
       document.querySelectorAll(".resource-card-btn").forEach(btn => btn.classList.remove("active"));
       if(button) button.classList.add("active");
       currentResourceUrl = resource.url;
-      els.emptyState.classList.remove("show");
-      els.libraryFrame.classList.add("loading");
-      els.libraryFrame.src = resource.url;
+      if(els.emptyState) els.emptyState.classList.remove("show");
+      if(els.libraryFrame){
+        els.libraryFrame.classList.add("loading");
+        els.libraryFrame.src = resource.url;
+      }
       setDirectLink(resource.url);
     }
 
     function setDirectLink(url){
       [els.directLinkTop,els.directLinkBottom].forEach(link => {
+        if(!link) return;
         if(!url){
           link.href = "#";
           link.style.visibility = "hidden";
@@ -1285,57 +1266,45 @@
       }
     }
 
-    els.searchInput.addEventListener("input",function(){
-      searchQuery = this.value.trim().toLowerCase();
-      renderResources();
-    });
-
     function toggleFab(){
-      els.fabMenu.classList.toggle("open");
+      if(els.fabMenu) els.fabMenu.classList.toggle("open");
     }
-
-    document.addEventListener("click",function(e){
-      const fab = document.getElementById("helpFab");
-      if(fab && !fab.contains(e.target)) els.fabMenu.classList.remove("open");
-    });
 
     function setupContactLinks(){
       const text = encodeURIComponent("Aradığım kaynağı bulamadım. Yardımcı olabilir misiniz?");
       const number = "905409122503";
-      document.getElementById("waLink").href = `https://wa.me/${number}?text=${text}`;
-      document.getElementById("smsLink").href = `sms:+${number}?&body=${text}`;
+      const wa = document.getElementById("waLink");
+      const sms = document.getElementById("smsLink");
+      if(wa) wa.href = `https://wa.me/${number}?text=${text}`;
+      if(sms) sms.href = `sms:+${number}?&body=${text}`;
     }
 
     document.addEventListener("DOMContentLoaded",function(){
       setupContactLinks();
 
+      if(els.searchInput){
+        els.searchInput.addEventListener("input",function(){
+          searchQuery = this.value.trim().toLowerCase();
+          renderResources();
+        });
+      }
+
+      document.addEventListener("click",function(e){
+        const fab = document.getElementById("helpFab");
+        if(fab && !fab.contains(e.target) && els.fabMenu) els.fabMenu.classList.remove("open");
+      });
+
       setTimeout(function(){
         if(typeof window.aydaCheckPassword === "function"){
           setStatus("ok","Merkezi şifre sistemi hazır");
         }else{
-          setStatus("warn","Merkezi sistem bekleniyor");
+          setStatus("bad","Şifre sistemi yüklenemedi");
+          showMessage("error","Şifre sistemi yüklenemedi. access-control.js dosyasının erişilebilir olduğundan emin olunuz.");
         }
-      },300);
+      },500);
 
-      const input = document.getElementById("aydaPasswordInput");
-      if(input){
-        input.addEventListener("keydown",function(event){
-          if(event.key === "Enter"){
-            event.preventDefault();
-            handleAydaLogin(event);
-          }
-        });
-      }
-
-      const protectedContent = document.getElementById("aydaProtectedContent");
-      if(protectedContent){
-        const observer = new MutationObserver(syncAydaAccessUI);
-        observer.observe(protectedContent,{attributes:true,attributeFilter:["style","class"]});
-      }
-
-      setTimeout(syncAydaAccessUI,100);
-      setTimeout(syncAydaAccessUI,600);
-      restoreAydaAccess();
+      setTimeout(activateLibraryIfOpen,150);
+      setTimeout(activateLibraryIfOpen,700);
 
       if(els.libraryFrame){
         els.libraryFrame.addEventListener("load",function(){

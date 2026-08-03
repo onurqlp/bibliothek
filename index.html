@@ -445,12 +445,13 @@
     #aydaProtectedContent {
       display: none;
       flex: 1;
-    }
-
-    #aydaProtectedContent.is-open {
-      display: grid !important;
       grid-template-columns: 292px minmax(0, 1fr);
       min-height: 0;
+    }
+
+    #aydaProtectedContent[style*="display: block"],
+    #aydaProtectedContent[style*="display: grid"] {
+      display: grid !important;
     }
 
     .sidebar {
@@ -804,7 +805,7 @@
         border-top: 1px solid var(--line);
       }
 
-      #aydaProtectedContent.is-open {
+      #aydaProtectedContent {
         grid-template-columns: 1fr;
       }
 
@@ -988,14 +989,14 @@
                   </button>
                 </div>
               </div>
-              <button id="loginBtn" class="button primary" type="submit">
+              <button id="loginBtn" class="button primary" type="button" onclick="aydaCheckPassword()">
                 <i data-lucide="log-in" class="icon"></i>
                 Giriş yap
               </button>
             </form>
 
             <div id="aydaLoginMessage" class="message is-info" role="status" aria-live="polite">Sınıf kodunuzu girerek kütüphaneye erişebilirsiniz.</div>
-            <p class="login-note">Kodlar <code>access-control.js</code> üzerinden Google Sheets listesinden doğrulanır; bu sayfa şifre listesini kendi içinde saklamaz.</p>
+            <p class="login-note">Kodlar AYDA merkezi şifre sistemi üzerinden doğrulanır; bu sayfa şifre listesini kendi içinde saklamaz.</p>
           </div>
         </aside>
       </section>
@@ -1185,7 +1186,6 @@
       tags: new Set(),
       query: "",
       initialized: false,
-      authenticated: false,
       currentResource: null
     };
 
@@ -1224,33 +1224,6 @@
       if (!els.aydaLoginMessage) return;
       els.aydaLoginMessage.className = "message is-" + type;
       els.aydaLoginMessage.textContent = text;
-    }
-
-    function classifyMessage() {
-      if (!els.aydaLoginMessage) return;
-      const text = els.aydaLoginMessage.textContent.toLocaleLowerCase("tr-TR");
-      if (text.includes("başar")) {
-        els.aydaLoginMessage.className = "message is-success";
-      } else if (text.includes("hatalı") || text.includes("dol") || text.includes("yüklenemedi") || text.includes("giriniz")) {
-        els.aydaLoginMessage.className = "message is-error";
-      } else {
-        els.aydaLoginMessage.className = "message is-info";
-      }
-    }
-
-    function maskCode(code) {
-      const value = String(code || "");
-      if (!value) return "aktif";
-      if (value.length <= 4) return "••" + value.slice(-1);
-      return value.slice(0, 2) + "••••" + value.slice(-2);
-    }
-
-    function getStoredCode() {
-      return localStorage.getItem("ayda_code") || localStorage.getItem("aydaCode") || "";
-    }
-
-    function hasStoredAccess() {
-      return String(localStorage.getItem("ayda_access") || localStorage.getItem("aydaAccess") || "").toLowerCase() === "true";
     }
 
     function allResources() {
@@ -1420,103 +1393,20 @@
       createIcons();
     }
 
-    function unlockApp(source) {
-      state.authenticated = true;
-      initializeLibrary();
-      document.body.dataset.auth = "true";
-      els.aydaLoginBox.style.display = "none";
-      els.aydaProtectedContent.classList.add("is-open");
-      els.aydaProtectedContent.style.display = "grid";
-      els.activeCodeLabel.textContent = "Kod: " + maskCode(getStoredCode());
-      setStatus("ok", source === "auto" ? "Oturum açık" : "Kütüphane açık");
-    }
-
-    function lockApp(message) {
-      state.authenticated = false;
-      document.body.dataset.auth = "false";
-      els.aydaProtectedContent.classList.remove("is-open");
-      els.aydaProtectedContent.style.display = "none";
-      els.aydaLoginBox.style.display = "grid";
-      clearViewer(true);
-      setStatus("warn", "Giriş bekleniyor");
-      if (message) setMessage("info", message);
-    }
-
-    function syncAuthFromExternal(source) {
-      const protectedInlineOpen = els.aydaProtectedContent.style.display === "block" || els.aydaProtectedContent.style.display === "grid";
-      if (hasStoredAccess() || protectedInlineOpen) {
-        unlockApp(source || "auto");
-      } else if (!state.authenticated) {
-        if (window.__aydaAccessScriptFailed) {
-          setStatus("bad", "Şifre sistemi yüklenemedi");
-        } else if (typeof window.aydaCheckPassword === "function") {
-          setStatus("ok", "Şifre sistemi hazır");
-        } else {
-          setStatus("warn", "Şifre sistemi bağlanıyor");
-        }
-      }
-    }
-
-    function withTimeout(promise, ms) {
-      return Promise.race([
-        Promise.resolve(promise),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms))
-      ]);
-    }
-
-    async function handleLogin(event) {
-      event.preventDefault();
-      const code = els.aydaPasswordInput.value.trim();
-
-      if (!code) {
-        setMessage("error", "Şifre giriniz.");
-        setStatus("warn", "Giriş bekleniyor");
-        return;
-      }
-
-      if (typeof window.aydaCheckPassword !== "function") {
-        setMessage("error", "Şifre sistemi yüklenemedi.");
-        setStatus("bad", "Şifre sistemi yüklenemedi");
-        return;
-      }
-
-      const previousHtml = els.loginBtn.innerHTML;
-      els.loginBtn.disabled = true;
-      els.loginBtn.innerHTML = `<i data-lucide="loader-circle" class="icon"></i> Kontrol ediliyor`;
-      createIcons();
-      setMessage("info", "Sınıf kodu kontrol ediliyor.");
-      setStatus("warn", "Kontrol ediliyor");
-
-      try {
-        await withTimeout(window.aydaCheckPassword(), 15000);
-        classifyMessage();
-        if (hasStoredAccess() || els.aydaProtectedContent.style.display === "block") {
-          unlockApp("manual");
-          setMessage("success", "Giriş başarılı.");
-        } else {
-          setStatus("warn", "Giriş bekleniyor");
-        }
-      } catch (error) {
-        const timedOut = error && error.message === "timeout";
-        setMessage("error", timedOut ? "Şifre sistemi yanıt vermedi. Bağlantınızı kontrol edip tekrar deneyiniz." : "Giriş kontrolünde hata oluştu.");
-        setStatus("bad", timedOut ? "Yanıt alınamadı" : "Giriş hatası");
-      } finally {
-        els.loginBtn.disabled = false;
-        els.loginBtn.innerHTML = previousHtml;
-        createIcons();
-      }
-    }
-
     function logout() {
       if (typeof window.aydaClearAccess === "function") {
-        try { window.aydaClearAccess(); } catch (error) { console.warn(error); }
+        try {
+          window.aydaClearAccess();
+        } catch (error) {
+          console.warn(error);
+        }
       }
-      ["ayda_access", "aydaAccess", "ayda_code", "aydaCode"].forEach(key => {
-        localStorage.removeItem(key);
-        sessionStorage.removeItem(key);
-      });
-      els.aydaPasswordInput.value = "";
-      lockApp("Çıkış yapıldı.");
+
+      localStorage.removeItem("ayda_access");
+      localStorage.removeItem("ayda_code");
+      sessionStorage.removeItem("ayda_access");
+      sessionStorage.removeItem("ayda_code");
+      window.location.reload();
     }
 
     function togglePassword() {
@@ -1553,49 +1443,67 @@
       els.smsLink.href = `sms:+${number}?&body=${text}`;
     }
 
+    function syncCentralAccessStatus() {
+      if (window.__aydaAccessScriptFailed || typeof window.aydaCheckPassword !== "function") {
+        setStatus("bad", "Şifre sistemi yüklenemedi");
+        return;
+      }
+
+      const isOpen = window.getComputedStyle(els.aydaProtectedContent).display !== "none";
+      setStatus("ok", isOpen ? "Kütüphane açık" : "Şifre sistemi hazır");
+      if (isOpen && els.activeCodeLabel) {
+        els.activeCodeLabel.textContent = "Merkezi erişim aktif";
+      }
+    }
+
     function bindEvents() {
-      els.loginForm.addEventListener("submit", handleLogin);
+      els.loginForm.addEventListener("submit", event => {
+        event.preventDefault();
+        if (typeof window.aydaCheckPassword === "function") {
+          window.aydaCheckPassword();
+        }
+      });
+
       els.togglePasswordBtn.addEventListener("click", togglePassword);
       els.logoutBtn.addEventListener("click", logout);
       els.clearFiltersBtn.addEventListener("click", clearFilters);
       els.copyLinkBtn.addEventListener("click", copyCurrentLink);
+
       [els.directLinkTop, els.directLinkBottom].forEach(link => {
         link.addEventListener("click", event => {
           if (!state.currentResource) event.preventDefault();
         });
       });
+
       els.searchInput.addEventListener("input", event => {
         state.query = event.target.value.trim();
         renderResources();
       });
-      els.libraryFrame.addEventListener("load", () => els.libraryFrame.classList.remove("is-loading"));
 
-      const observer = new MutationObserver(() => {
-        classifyMessage();
-        syncAuthFromExternal("auto");
+      els.libraryFrame.addEventListener("load", () => {
+        els.libraryFrame.classList.remove("is-loading");
       });
-      observer.observe(els.aydaProtectedContent, { attributes: true, attributeFilter: ["style", "class"] });
-      observer.observe(els.aydaLoginMessage, { childList: true, characterData: true, subtree: true });
+
+      const accessObserver = new MutationObserver(syncCentralAccessStatus);
+      accessObserver.observe(els.aydaProtectedContent, {
+        attributes: true,
+        attributeFilter: ["style", "class"]
+      });
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       cacheElements();
       setupContactLinks();
       bindEvents();
+      initializeLibrary();
       createIcons();
 
-      if (window.__aydaAccessScriptFailed) {
+      if (window.__aydaAccessScriptFailed || typeof window.aydaCheckPassword !== "function") {
         setStatus("bad", "Şifre sistemi yüklenemedi");
         setMessage("error", "Şifre sistemi yüklenemedi.");
-      } else if (typeof window.aydaCheckPassword === "function") {
-        setStatus("ok", "Şifre sistemi hazır");
       } else {
-        setStatus("bad", "Şifre sistemi yüklenemedi");
+        syncCentralAccessStatus();
       }
-
-      syncAuthFromExternal("auto");
-      setTimeout(() => syncAuthFromExternal("auto"), 600);
-      setTimeout(() => syncAuthFromExternal("auto"), 1600);
     });
   </script>
 </body>

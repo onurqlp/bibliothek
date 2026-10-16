@@ -925,7 +925,60 @@
         grid-template-columns: 1fr;
       }
     }
-  </style>
+  
+/* AYDA compact resource viewer; existing code-login and iframe behavior untouched */
+:root{--bg:#fbf9f5;--surface:#fff;--surface-soft:#f3f5f6;--ink:#172a42;--muted:#657185;--line:#e3e6e7;--brand:#102541;--brand-2:#244864;--accent:#c69e54;--shadow:0 12px 32px rgba(16,37,65,.075)}
+.page{max-width:1450px}
+.app-shell{border-color:#e6e6e0;box-shadow:0 10px 32px rgba(16,37,65,.045)}
+.brand-mark{background:#102541}
+.button{min-height:42px}
+.level-button,.chip{min-height:40px}
+.resource-card{border-radius:11px;min-height:55px}
+.resources-pane{scrollbar-width:thin}
+.resource-list{gap:7px}
+.viewer{background:#fff}
+.empty-box{border-radius:13px;box-shadow:0 8px 20px rgba(16,37,65,.05)}
+:focus-visible{outline:3px solid #e8c37b;outline-offset:3px}
+@media(max-width:1120px){
+ .login-panel{order:-1}
+ .login-visual{min-height:0;padding:19px}
+ .login-copy h2{font-size:25px;line-height:1.2}
+}
+@media(max-width:720px){
+ .topbar{padding:11px 12px;gap:8px}
+ .brand-title h1{font-size:17px}
+ .brand-title p{font-size:11px}
+ .login-panel{padding:15px 13px}
+ .login-visual{min-height:0;padding:14px}
+ .login-copy h2{max-width:none;font-size:20px}
+ .login-copy p{max-width:none;font-size:12px;line-height:1.4}
+ .login-visual .metric-strip{display:none}
+ .form-box{padding:14px}
+ .login-form .button.primary{min-height:48px;width:100%}
+ .sidebar{padding:12px}
+ .sidebar-head{margin-bottom:8px}
+ .level-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+ .level-button{font-size:12px;padding:8px 5px;min-height:43px}
+ .chip-wrap{gap:6px}
+ .content-toolbar{padding:12px;gap:9px}
+ .content-actions .button{min-height:44px}
+ .resources-pane{max-height:290px}
+ .resource-card{grid-template-columns:auto minmax(0,1fr);padding:10px;gap:9px}
+ .viewer-bar{flex-direction:row;align-items:center}
+ .viewer-title{flex:1}
+ .viewer-bar>.button{flex:none;min-height:40px}
+ iframe{min-height:360px}
+}
+@media(max-width:440px){
+ .level-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .resource-card{grid-template-columns:auto minmax(0,1fr)}
+ .quick-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .login-visual{padding:12px}
+ .top-actions{gap:6px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+</style>
 </head>
 <body data-auth="false">
   <main class="page">
@@ -968,7 +1021,7 @@
               <div class="metric"><strong>5</strong><span>Kaynak bölümü</span></div>
               <div class="metric"><strong>52</strong><span>Bağlantı</span></div>
               <div class="metric"><strong>A1-B2</strong><span>Seviye aralığı</span></div>
-              <div class="metric"><strong>2027</strong><span>Güncel düzen</span></div>
+              <div class="metric"><strong>AYDA</strong><span>Kaynak merkezi</span></div>
             </div>
           </div>
         </section>
@@ -1004,7 +1057,7 @@
       <section id="aydaProtectedContent" aria-label="AYDA kütüphanesi">
         <aside class="sidebar">
           <div class="sidebar-head">
-            <h2>Kütüphane</h2>
+            <h2>Kaynakları Bul</h2>
             <p id="activeCodeLabel">Kod: aktif</p>
           </div>
 
@@ -1022,7 +1075,7 @@
             <div class="label">Arama</div>
             <div class="search">
               <i data-lucide="search" class="icon" aria-hidden="true"></i>
-              <input id="searchInput" type="search" placeholder="Kaynak ara" autocomplete="off" />
+              <input id="searchInput" type="search" placeholder="Kitap, PDF, ses, video veya sınav ara…" autocomplete="off" />
             </div>
           </div>
 
@@ -1080,7 +1133,7 @@
                 <div id="emptyState" class="empty-state">
                   <div class="empty-box">
                     <strong>Kaynak seçilmedi</strong>
-                    <p>Drive, YouTube ve online çalışma kaynakları burada önizlenir. Dış siteler için yeni sekme bağlantısı hazır kalır.</p>
+                    <p>Soldaki listeden bir kaynak seçin. Önizleme açılmazsa “Yeni sekme” veya “Aç” düğmesini kullanın.</p>
                   </div>
                 </div>
               </div>

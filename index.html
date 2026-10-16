@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#24416f" />
+  <meta name="theme-color" content="#122850" />
   <meta name="color-scheme" content="light" />
   <title>AYDA Online Kütüphane</title>
   <style>
@@ -978,6 +978,51 @@
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 
+
+/* AYDA B1-inspired 2026 library UI: no changes to the central access script */
+:root{--bg:#f8f7f2;--surface:#fff;--surface-soft:#eef2f7;--ink:#14213d;--muted:#60708d;--line:#dde5f0;--brand:#122850;--brand-2:#244269;--accent:#ffcf4a;--green:#159a74;--shadow:0 15px 42px #12285014}
+body{background:var(--bg);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
+.app-shell{box-shadow:0 20px 58px #12285014;border-radius:19px}
+.topbar{background:#fff}
+.brand-mark{background:#122850;color:#ffcf4a;border-radius:11px}
+.login-visual{background:linear-gradient(135deg,#122850,#214665)}
+.login-copy h2{font-weight:900;letter-spacing:-.035em}
+.form-box{border-color:#dde5f0;box-shadow:0 9px 25px #12285010}
+.button.primary{background:#ffcf4a;color:#29220a;border-color:#ffcf4a;font-weight:900}
+.button.primary:hover{background:#f4c13b}
+.level-button.is-active,.chip.is-active{background:#122850;color:#fff;border-color:#122850}
+.resource-card{background:#fff;border-radius:12px;min-height:65px;padding:10px}
+.resource-card.is-active{border-color:#122850;background:#fff8e6}
+.resource-list{gap:7px}
+.library-workspace{grid-template-columns:minmax(280px,360px) minmax(0,1fr)}
+.resources-pane{background:#fbfcfe}
+.viewer{scroll-margin-top:12px}
+.library-favorites-filter{display:flex;align-items:center;justify-content:center;gap:8px;background:#fff8e6;color:#122850;border-color:#ead79b;font-weight:850}
+.library-favorites-filter.is-active{background:#ffcf4a;border-color:#ffcf4a}
+.favorite-count{display:inline-grid;place-items:center;background:#122850;color:#fff;border-radius:999px;min-width:23px;height:23px;padding:0 6px;font-size:11px}
+.library-save[aria-pressed=true]{background:#fff0bf;border-color:#deb95f;color:#122850}
+.library-notice{height:0;overflow:hidden;text-align:center;font-weight:850;font-size:12px;transition:height .2s;opacity:0}
+.library-notice.visible{height:auto;min-height:31px;padding:8px;background:#e8f8f0;color:#14654e;opacity:1}
+:focus-visible{outline:3px solid #ffcf4a;outline-offset:3px}
+@media(max-width:1120px){.library-workspace{grid-template-columns:1fr}.resources-pane{max-height:350px}}
+@media(max-width:720px){
+ .page{padding:8px}
+ .app-shell{border-radius:12px}
+ .login-visual{padding:15px}
+ .login-copy h2{font-size:22px}
+ .login-copy p{font-size:12px}
+ .level-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .sidebar{padding:12px}
+ .content-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .content-actions .library-save{grid-column:1/-1}
+ .content-actions .button{font-size:12px;min-height:44px}
+ .resources-pane{max-height:290px}
+ .resource-card{min-height:58px;grid-template-columns:30px minmax(0,1fr)}
+ .viewer{scroll-margin-top:8px}
+ iframe{min-height:390px}
+}
+@media(max-width:420px){.level-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.library-notice{transition:none}}
 </style>
 </head>
 <body data-auth="false">
@@ -1084,6 +1129,9 @@
             <div class="stat-box"><strong id="totalCount">0</strong><span>Toplam kaynak</span></div>
           </div>
 
+          <button id="libraryFavoritesFilter" class="button library-favorites-filter" type="button" aria-pressed="false">
+<i data-lucide="star" class="icon"></i> Favori Kaynaklarım <span id="libraryFavoritesCount" class="favorite-count">0</span>
+</button>
           <button id="clearFiltersBtn" class="button" type="button">
             <i data-lucide="rotate-ccw" class="icon"></i>
             Filtreleri sıfırla
@@ -1095,19 +1143,21 @@
         </aside>
 
         <section class="library-main">
+          <div id="libraryNotice" class="library-notice" aria-live="polite" role="status"></div>
           <div class="content-toolbar">
             <div class="content-head">
               <h2 id="viewerTitle">A1 Online Kütüphane</h2>
               <p id="viewerMeta">Kaynaklar hazırlanıyor.</p>
             </div>
             <div class="content-actions">
+              <button id="librarySaveFavorite" class="button library-save" type="button" disabled aria-pressed="false"><i data-lucide="star" class="icon"></i> Favoriye Ekle</button>
               <button id="copyLinkBtn" class="button" type="button" disabled>
                 <i data-lucide="copy" class="icon"></i>
                 Linki kopyala
               </button>
               <a id="directLinkTop" class="button" href="#" target="_blank" rel="noopener" aria-disabled="true">
                 <i data-lucide="external-link" class="icon"></i>
-                Yeni sekme
+                Dosyayı Aç ↗
               </a>
             </div>
           </div>
@@ -1239,9 +1289,39 @@
       tags: new Set(),
       query: "",
       initialized: false,
+      onlyFavorites: false,
+      previousLevel: "A1",
       currentResource: null
     };
 
+    const favoriteStorageKey="ayda_library_favorites_v2";
+    let favoriteUrls=[];
+    try{const val=JSON.parse(localStorage.getItem(favoriteStorageKey)||"[]");if(Array.isArray(val))favoriteUrls=val.filter(x=>typeof x==="string");}catch(err){}
+    const favorites=new Set(favoriteUrls);
+    let messageTimeout;
+    function notifyLibrary(message){
+      const el=document.getElementById("libraryNotice");
+      if(!el)return;
+      el.textContent=message;
+      el.classList.add("visible");
+      clearTimeout(messageTimeout);
+      messageTimeout=setTimeout(()=>el.classList.remove("visible"),2400);
+    }
+    function saveFavorites(){try{localStorage.setItem(favoriteStorageKey,JSON.stringify([...favorites]));}catch(err){}}
+    function syncFavoriteUi(){
+      const active=Boolean(state.currentResource&&favorites.has(state.currentResource.url));
+      if(els.librarySaveFavorite){
+        els.librarySaveFavorite.disabled=!state.currentResource;
+        els.librarySaveFavorite.setAttribute("aria-pressed",String(active));
+        els.librarySaveFavorite.innerHTML='<i data-lucide="star" class="icon"></i> '+(active?"Favoriden Çıkar":"Favoriye Ekle");
+      }
+      if(els.libraryFavoritesFilter){
+        els.libraryFavoritesFilter.setAttribute("aria-pressed",String(state.onlyFavorites));
+        els.libraryFavoritesFilter.classList.toggle("is-active",state.onlyFavorites);
+      }
+      if(els.libraryFavoritesCount)els.libraryFavoritesCount.textContent=String(favorites.size);
+      createIcons();
+    }
     const els = {};
 
     function $(id) {
@@ -1257,7 +1337,7 @@
         "viewerMeta", "resourceList", "currentResourceTitle",
         "currentResourceMeta", "libraryFrame", "emptyState", "copyLinkBtn",
         "directLinkTop", "directLinkBottom", "clearFiltersBtn", "logoutBtn",
-        "waLink", "smsLink"
+        "waLink", "smsLink", "librarySaveFavorite", "libraryFavoritesFilter", "libraryFavoritesCount"
       ].forEach(id => { els[id] = $(id); });
     }
 
@@ -1300,6 +1380,7 @@
         });
       }
 
+      if(state.onlyFavorites) list=list.filter(item=>favorites.has(item.url));
       return list;
     }
 
@@ -1334,6 +1415,7 @@
 
       els.levelGrid.querySelectorAll("[data-level]").forEach(btn => {
         btn.addEventListener("click", () => {
+          state.onlyFavorites=false;
           state.level = btn.dataset.level;
           renderResources();
         });
@@ -1356,6 +1438,7 @@
       els.tagWrap.querySelectorAll("[data-tag]").forEach(btn => {
         btn.classList.toggle("is-active", state.tags.has(btn.dataset.tag));
       });
+      syncFavoriteUi();
     }
 
     function renderResources() {
@@ -1365,8 +1448,8 @@
       syncActiveControls();
       els.visibleCount.textContent = String(list.length);
       els.totalCount.textContent = String(total);
-      els.viewerTitle.textContent = levelLabel(state.level) + " Online Kütüphane";
-      els.viewerMeta.textContent = list.length ? `${list.length} kaynak listeleniyor.` : "Bu filtrede kaynak yok.";
+      els.viewerTitle.textContent = state.onlyFavorites ? "★ Favori Kaynaklarım" : levelLabel(state.level) + " Online Kütüphane";
+      els.viewerMeta.textContent = list.length ? `${list.length} kaynak listeleniyor.` : (state.onlyFavorites ? "Henüz favori kaynağınız yok. Bir kaynak açıp yıldızlayın." : "Bu filtrede kaynak yok.");
       els.resourceList.innerHTML = "";
 
       if (!list.length) {
@@ -1415,6 +1498,11 @@
       els.libraryFrame.src = item.url;
       els.emptyState.classList.add("is-hidden");
       setDirectLinks(item.url);
+      syncFavoriteUi();
+      if(window.matchMedia("(max-width: 850px)").matches){
+        const viewer=document.querySelector(".viewer");
+        if(viewer) viewer.scrollIntoView({behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+      }
     }
 
     function clearViewer(resetCurrent) {
@@ -1425,6 +1513,7 @@
       els.libraryFrame.classList.remove("is-loading");
       els.emptyState.classList.remove("is-hidden");
       setDirectLinks("");
+      syncFavoriteUi();
     }
 
     function setDirectLinks(url) {
@@ -1471,17 +1560,23 @@
 
     async function copyCurrentLink() {
       if (!state.currentResource) return;
-      const url = state.currentResource.url;
-      try {
-        await navigator.clipboard.writeText(url);
-        els.currentResourceMeta.textContent = "Link kopyalandı.";
-      } catch (error) {
-        window.prompt("Kaynak linki", url);
+      const url=state.currentResource.url;
+      let copied=false;
+      if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(url);copied=true;}catch(error){}}
+      if(!copied){
+        const input=document.createElement("textarea");
+        input.value=url;input.setAttribute("readonly","");input.style.cssText="position:fixed;left:-9999px";
+        document.body.appendChild(input);input.select();
+        try{copied=document.execCommand("copy");}catch(error){}
+        input.remove();
       }
+      if(copied)notifyLibrary("Kaynak bağlantısı kopyalandı");
+      else window.prompt("Kaynak bağlantısı (kopyalayın)",url);
     }
 
     function clearFilters() {
       state.level = "A1";
+      state.onlyFavorites=false;
       state.tags.clear();
       state.query = "";
       els.searchInput.value = "";
@@ -1521,6 +1616,28 @@
       els.logoutBtn.addEventListener("click", logout);
       els.clearFiltersBtn.addEventListener("click", clearFilters);
       els.copyLinkBtn.addEventListener("click", copyCurrentLink);
+      els.librarySaveFavorite.addEventListener("click",()=>{
+        if(!state.currentResource)return;
+        const url=state.currentResource.url;
+        if(favorites.has(url))favorites.delete(url);else favorites.add(url);
+        saveFavorites();
+        notifyLibrary(favorites.has(url)?"Favorilere kaydedildi":"Favorilerden çıkarıldı");
+        renderResources();
+        syncFavoriteUi();
+      });
+      els.libraryFavoritesFilter.addEventListener("click",()=>{
+        state.onlyFavorites=!state.onlyFavorites;
+        if(state.onlyFavorites){
+          state.previousLevel=state.level;
+          state.level="TUMU";
+          state.tags.clear();
+          state.query="";els.searchInput.value="";
+        }else{
+          state.level=state.previousLevel||"A1";
+        }
+        renderResources();
+        syncFavoriteUi();
+      });
 
       [els.directLinkTop, els.directLinkBottom].forEach(link => {
         link.addEventListener("click", event => {

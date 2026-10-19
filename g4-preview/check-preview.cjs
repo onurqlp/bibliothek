@@ -1,6 +1,20 @@
 const {chromium}=require('playwright');
 const fs=require('fs');
 const path=require('path');
+const https=require('https');
+async function remotePreviewCheck(){
+ const url='https://onurqlp.github.io/bibliothek/g4-preview/';
+ return await new Promise(resolve=>{
+  const req=https.get(url,{headers:{'User-Agent':'AYDA-G4-Preview-QA/1.0'}},res=>{
+   let data='';res.setEncoding('utf8');
+   res.on('data',x=>{if(data.length<110000)data+=x});
+   res.on('end',()=>resolve({url,status:res.statusCode,titleFound:data.includes('AYDA Dijital Kütüphane'),previewMarkerFound:data.includes('g4-preview-mode')}));
+  });
+  req.setTimeout(12000,()=>req.destroy(new Error('timeout')));
+  req.on('error',e=>resolve({url,status:'connection_error',details:e.code||e.message}));
+ });
+}
+
 const local='file://'+path.resolve('g4-preview/index.html');
 const dir='g4-preview/qa';
 fs.mkdirSync(dir,{recursive:true});
@@ -80,7 +94,8 @@ fs.mkdirSync(dir,{recursive:true});
  const preserve=original.split('const CONTENT = {')[1]?.split('const favoriteStorageKey')[0];
  const previewPreserve=redesigned.split('const CONTENT = {')[1]?.split('const favoriteStorageKey')[0];
  const sameSource=preserve===previewPreserve;
- const result={checkedAt:new Date().toISOString(),sourceLinksUnchanged:sameSource,mainIndexUnmodifiedByThisPreview:true,allPassed:sameSource&&checks.every(c=>c.passed),checks};
+ const publicPreview=await remotePreviewCheck();
+ const result={checkedAt:new Date().toISOString(),sourceLinksUnchanged:sameSource,mainIndexUnmodifiedByThisPreview:true,allPassed:sameSource&&checks.every(c=>c.passed),publicPreview,checks};
  fs.writeFileSync(path.join(dir,'latest.json'),JSON.stringify(result,null,2));
  console.log(JSON.stringify(result,null,2));
  if(!result.allPassed)process.exitCode=1;

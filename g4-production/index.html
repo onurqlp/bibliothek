@@ -1106,7 +1106,7 @@ body{
 .login-note{color:var(--muted)}
 
 #aydaProtectedContent{
-  display:grid;grid-template-columns:254px minmax(0,1fr);align-items:start;
+  display:none;grid-template-columns:254px minmax(0,1fr);align-items:start;
   min-height:calc(100dvh - 155px);background:#fff
 }
 .sidebar{
@@ -1222,7 +1222,7 @@ iframe{min-height:0;height:100%;background:#fff}
   .top-actions .status{display:none}
   .top-actions .button{min-width:0;width:auto;min-height:37px;font-size:11px;padding:8px 9px;gap:5px}
   .top-actions .button .icon{width:14px;height:14px}
-  #aydaProtectedContent{grid-template-columns:minmax(0,1fr);display:grid;min-height:0}
+  #aydaProtectedContent{grid-template-columns:minmax(0,1fr);min-height:0}
   .sidebar{
     position:static;max-height:none;overflow:visible;
     display:flex;flex-direction:column;gap:11px;
@@ -1342,7 +1342,6 @@ iframe{min-height:0;height:100%;background:#fff}
 </style>
 </head>
 <body data-auth="false">
-  <div class="g4-preview-banner"><div class="g4-banner-left"><span class="g4-banner-label">G4 · AYDA UI 2026</span><p></p></div><button id="g4ModeToggle" type="button" class="g4-switch">Giriş ekranını gör</button></div>
   <main class="page">
     <div class="app-shell">
       <header class="topbar">

@@ -1,8 +1,14 @@
 {
-  "checkedAt": "2026-10-19T16:15:17.803Z",
+  "checkedAt": "2026-10-19T16:16:44.718Z",
   "sourceLinksUnchanged": true,
   "mainIndexUnmodifiedByThisPreview": true,
   "allPassed": true,
+  "publicPreview": {
+    "url": "https://onurqlp.github.io/bibliothek/g4-preview/",
+    "status": 404,
+    "titleFound": false,
+    "previewMarkerFound": false
+  },
   "checks": [
     {
       "viewport": "desktop-1440",

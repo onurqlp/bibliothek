@@ -3,7 +3,7 @@ const fs=require('fs');
 const path=require('path');
 const https=require('https');
 async function remotePreviewCheck(){
- const url='https://onurqlp.github.io/bibliothek/g4-preview/';
+ const url='https://ayda-g4-kutuphane-onizleme.vercel.app/';
  return await new Promise(resolve=>{
   const req=https.get(url,{headers:{'User-Agent':'AYDA-G4-Preview-QA/1.0'}},res=>{
    let data='';res.setEncoding('utf8');
@@ -95,7 +95,7 @@ fs.mkdirSync(dir,{recursive:true});
  const previewPreserve=redesigned.split('const CONTENT = {')[1]?.split('const favoriteStorageKey')[0];
  const sameSource=preserve===previewPreserve;
  const publicPreview=await remotePreviewCheck();
- const result={checkedAt:new Date().toISOString(),sourceLinksUnchanged:sameSource,mainIndexUnmodifiedByThisPreview:true,allPassed:sameSource&&checks.every(c=>c.passed),publicPreview,checks};
+ const result={checkedAt:new Date().toISOString(),sourceLinksUnchanged:sameSource,mainIndexUnmodifiedByThisPreview:true,allPassed:sameSource&&checks.every(c=>c.passed)&&publicPreview.status===200&&publicPreview.titleFound&&publicPreview.previewMarkerFound,publicPreview,checks};
  fs.writeFileSync(path.join(dir,'latest.json'),JSON.stringify(result,null,2));
  console.log(JSON.stringify(result,null,2));
  if(!result.allPassed)process.exitCode=1;

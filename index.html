@@ -1026,20 +1026,56 @@ body{background:var(--bg);font-family:ui-sans-serif,system-ui,-apple-system,"Seg
 }
 @media(max-width:420px){.level-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.library-notice{transition:none}}
+</style><style id="g2-ayda-corporate">
+/* AYDA G2 kurumsal UI: G0/G1 standardi; kayit, filtre ve veri kodlari korunur */
+:root{--bg:#f6f8fc;--surface:#fff;--surface-soft:#edf3fb;--ink:#172b52;--muted:#667085;--line:#dfe7f2;--brand:#234078;--brand-2:#172b52;--accent:#d8a84f;--radius:16px;--shadow:0 10px 36px rgba(23,43,82,.07)}
+body{background:#f6f8fc!important;color:#172b52!important}
+.page{width:100%;max-width:none;padding:0}
+.app-shell{min-height:100vh;border:0;border-radius:0;box-shadow:none;background:#f6f8fc;overflow:visible}
+.g2-announcement{background:#172b52;color:#fff;width:100%}
+.g2-announcement>div{max-width:1180px;margin:auto;min-height:32px;padding:6px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:11px}
+.g2-announcement a{color:#fff;text-decoration:none;font-weight:700}
+.topbar{background:#234078!important;border:0!important;color:#fff!important;min-height:95px;padding:14px max(22px,calc((100% - 1136px)/2))!important;gap:20px}
+.brand{flex:0 0 auto;gap:12px}.g2-logo-link{display:flex;flex:0 0 170px;align-items:center;justify-content:center;max-width:42vw;min-height:55px}
+.g2-logo-link img{display:block;width:170px!important;max-width:100%;height:auto;aspect-ratio:134/49;object-fit:contain}
+.brand-title h1{font-size:14px!important;color:#fff!important;line-height:1.35}
+.brand-title p{color:#dce6f7!important;font-size:11px!important}
+.g2-corporate-nav{display:flex;align-items:center;justify-content:center;flex:1;gap:17px}
+.g2-corporate-nav a{color:white;text-decoration:none;font-weight:750;font-size:13px;white-space:nowrap}
+.g2-corporate-nav a[aria-current=page]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:7px}
+.top-actions{gap:6px}.topbar .status{background:#ffffff18;border:1px solid #ffffff44;color:#fff}.topbar .status .status-dot{box-shadow:none}
+.topbar .button{background:#ffffff14;color:#fff;border:1px solid #ffffff55;border-radius:12px;min-height:40px}.topbar .button:hover{background:#ffffff28;color:#fff}
+#aydaLoginBox{max-width:1180px;width:calc(100% - 32px);margin:26px auto;min-height:580px;gap:18px}
+.login-visual{border-radius:22px;min-height:580px;padding:36px;background:linear-gradient(115deg,rgba(17,42,79,.92),rgba(35,64,120,.56)),url("https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1400&q=80") center/cover}
+.login-panel{border:1px solid #dfe7f2;border-radius:22px;background:white;padding:33px}
+.login-copy h2{font-size:clamp(30px,3.8vw,46px);line-height:1.13}.login-copy p{color:#e9eff8}
+.metric{border-radius:14px}
+.form-box h3{color:#172b52}
+.input-row{border-color:#cbd7e7;border-radius:12px;min-height:51px}.input-row:focus-within{border-color:#234078;box-shadow:0 0 0 4px #23407819}
+.field label{color:#334967}
+.button,.icon-button{border-radius:12px;min-height:40px}.button.primary{background:#234078;border-color:#234078}.button.primary:hover{background:#172b52}
+.message{border-radius:12px;background:#f5f8fd;border-color:#dfe7f2}
+#aydaProtectedContent{max-width:1180px;width:calc(100% - 32px);margin:25px auto}
+.sidebar,.resource-card,.resource-panel,.library-card,.viewer,.main-panel{border-radius:16px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #d8a84f;outline-offset:2px}
+@media(max-width:1120px){.g2-corporate-nav{display:none}.topbar{padding:14px 20px!important}.brand-title h1{font-size:13px!important}}
+@media(max-width:720px){.g2-announcement>div{padding:7px 14px;font-size:9px}.topbar{padding:12px 15px!important;min-height:78px;flex-wrap:wrap}.g2-logo-link{flex-basis:122px;min-height:45px}.g2-logo-link img{width:122px!important}.brand-title p{display:none}.top-actions{margin-left:auto}#aydaLoginBox{width:calc(100% - 24px);margin:14px auto;gap:12px}.login-visual{min-height:300px;padding:24px;border-radius:17px}.login-panel{padding:24px;border-radius:17px}#aydaProtectedContent{width:calc(100% - 24px);margin:14px auto}}
+@media(max-width:440px){.topbar{gap:9px}.g2-logo-link{flex-basis:105px}.g2-logo-link img{width:105px!important}.brand-title h1{font-size:11px!important}.top-actions{width:100%;justify-content:flex-start}.login-copy h2{font-size:29px}.login-visual{min-height:280px}.g2-announcement>div{gap:7px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body data-auth="false">
   <main class="page">
     <div class="app-shell">
-      <header class="topbar">
+      <div class="g2-announcement"><div><span>AYDA DİL AKADEMİSİ · DİJİTAL ÖĞRENME</span><a href="https://www.aydadil.com/" target="_blank" rel="noopener">Kurumsal web sitesi ↗</a></div></div><header class="topbar">
         <div class="brand">
-          <div class="brand-mark" aria-hidden="true">A</div>
+          <a class="g2-logo-link" href="https://ders.aydadil.com/" aria-label="AYDA Öğrenci Portalı"><img src="https://www.aydadil.com/wp-content/uploads/2026/10/ayda-home-v89-baa791945bb954a30b.png" width="134" height="49" alt="AYDA Dil Akademisi logosu" decoding="async"></a>
           <div class="brand-title">
             <h1>AYDA Online Kütüphane</h1>
             <p>Almanca kaynakları ve sınav dosyaları</p>
           </div>
         </div>
-        <div class="top-actions">
+        <nav class="g2-corporate-nav" aria-label="AYDA platformları"><a href="https://ders.aydadil.com/">Öğrenci Portalı</a><a href="https://www.aydadil.com/bibliothek/" aria-current="page">Kütüphane</a><a href="https://www.aydadil.com/sinavhazirlik/">Sınav Hazırlık</a></nav><div class="top-actions">
           <div id="accessStatus" class="status is-warn" role="status" aria-live="polite">
             <span class="status-dot"></span>
             <span id="accessStatusText">Şifre sistemi bağlanıyor</span>
